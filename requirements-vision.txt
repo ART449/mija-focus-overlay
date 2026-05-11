@@ -1,0 +1,4 @@
+# Dependencias opcionales para Reconocimiento Visual Local
+# Instalar solo si se usará el "Banco de Referencias" (matcher.py)
+opencv-python
+numpy

@@ -1,41 +1,85 @@
-# M.I.J.A Focus Overlay (Abejita Señaladora)
+# 🐝 MIJA Focus Overlay — Abejita Señaladora
 
-Visual assistance system for identifying UI elements on screen.
+> **AI agents talk. Now they can point.**
 
-## How to use
+MIJA is a **visual guidance protocol** that lets AI agents highlight things on your screen — buttons, errors, windows, files — in real time. Transparent overlay. Click-through. Multi-monitor. Zero network.
 
-1. **Start Overlay**:
-   ```bash
-   python overlay.py
-   ```
-   (A transparent window will cover your screen. It is "click-through", so you can continue using your PC normally).
+```bash
+pip install -r requirements.txt
+python start_bee.bat
+```
 
-2. **Highlight an element**:
-   ```bash
-   python main.py highlight <x> <y> <w> <h> <color> <label>
-   ```
-   Example: `python main.py highlight 100 100 200 50 green "Boton Aceptar"`
+## What It Does
 
-3. **Find a window by title**:
-   ```bash
-   python main.py find "Notepad"
-   ```
+| Feature | Command |
+|---|---|
+| Highlight a region | `python main.py highlight <x> <y> <w> <h> green "PULSA AQUI" 15` |
+| Find & highlight a window | `python main.py find "Brave"` |
+| Visual template match | `python main.py match save_btn green 0.8 10` |
+| Save a visual template | `python main.py save_template save_btn 100 200 80 40` |
+| Clear overlay | `python main.py clear` |
+| Multi-monitor calibration | `python main.py calibrate` |
 
-4. **Clear current highlights**:
-   ```bash
-   python main.py clear
-   ```
+## Why MIJA?
 
-5. **Stop Overlay**:
-   ```bash
-   python main.py stop
-   ```
+Agents are great at reasoning. Terrible at pointing. MIJA bridges that gap — it's the missing sense for AI-Human collaboration:
+
+- **Zero Tokens Visual Memory**: Save screen regions as templates. Match them later by image, not by text description. Saves context window.
+- **Click-Through Overlay**: The overlay is transparent to mouse/keyboard — you keep working, the agent keeps pointing.
+- **Multi-Monitor DPI-Aware**: Virtual screen coordinates. Works across 1-4 monitors.
+- **No Network, No Telemetry**: Everything runs locally. Your screen is yours.
+
+## Quick Start
+
+```bash
+# 1. Install dependencies (~5 MB)
+pip install -r requirements.txt
+
+# 2. Optional: Install visual matching (~90 MB)
+pip install -r requirements-vision.txt
+
+# 3. Launch
+python start_bee.bat
+
+# 4. Try it
+python main.py test
+```
 
 ## Architecture
-- `overlay.py`: The UI engine (Tkinter + Windows API).
-- `vision.py`: Screen capture and window coordinate utilities.
-- `main.py`: Command-line controller.
-- `command.json`: Communication bridge.
 
-## Project Goal
-This is part of the **Abeja Señaladora** (Guide Bee) system to convert visual chaos into a navigable structure.
+```
+Agent → main.py → command.json → overlay.py → Screen
+                         ↑
+              matcher.py (visual memory, optional)
+              vision.py  (window detection)
+              selector.py (manual selection)
+              resident_bee.py (system tray)
+```
+
+File-based IPC via atomic JSON writes. PID-based lifecycle. No race conditions.
+
+## Protocol Colors
+
+| Color | Meaning | Usage |
+|---|---|---|
+| Green | Confirmed | "Click here", "This is the file" |
+| Yellow | Attention | "Look at this window", calibration |
+| Red | Warning / Risk | "Don't touch this", "Error here" |
+| Blue | Information | User-marked areas, context |
+
+## For AI Agents
+
+If you're an agent reading this, see [`AGENTS.md`](AGENTS.md) for the integration protocol. Any agent in the Colmena / IArtLabs Nexus ecosystem can use MIJA by calling `main.py` commands.
+
+## Requirements
+
+| Level | File | Size |
+|---|---|---|
+| Base | `requirements.txt` | ~5 MB |
+| + Vision | `requirements-vision.txt` | ~90 MB (OpenCV + NumPy) |
+
+---
+
+**Built by IArtLabs — Colmena Ecosystem.**
+
+*"Cero Humo, Total Evidencia."*

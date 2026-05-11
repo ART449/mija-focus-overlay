@@ -2,6 +2,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 .env
-command.json
-screen_capture.png
+*.pid
 *.log
+command.json
+command.json.tmp
+selection.json
+screen_capture.png
+templates/*.png
+!templates/.gitkeep

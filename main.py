@@ -3,12 +3,15 @@ import json
 import os
 from vision import capture_screen
 
-COMMAND_FILE = "command.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+COMMAND_FILE = os.path.join(BASE_DIR, "command.json")
 
 def send_command(data):
-    """Writes a command to the JSON file for the overlay to read."""
-    with open(COMMAND_FILE, "w") as f:
+    """Writes a command to the JSON file for the overlay to read using an atomic replace."""
+    temp_file = COMMAND_FILE + ".tmp"
+    with open(temp_file, "w") as f:
         json.dump(data, f)
+    os.replace(temp_file, COMMAND_FILE)
 
 def main():
     if len(sys.argv) < 2:
@@ -33,7 +36,8 @@ def main():
             "w": int(sys.argv[4]),
             "h": int(sys.argv[5]),
             "color": sys.argv[6] if len(sys.argv) > 6 else "green",
-            "label": sys.argv[7] if len(sys.argv) > 7 else "FOCUS"
+            "label": sys.argv[7] if len(sys.argv) > 7 else "FOCUS",
+            "duration": float(sys.argv[8]) if len(sys.argv) > 8 else 5.0 # Default 5s
         }
         send_command(data)
         print(f"SENT: Highlight at ({data['x']}, {data['y']}) Color: {data['color']}")
@@ -71,12 +75,91 @@ def main():
         else:
             print(f"NOT FOUND: {title}")
 
+    elif cmd == "calibrate":
+        print("Iniciando Calibración Multi-Monitor...")
+        import win32api
+        monitors = win32api.EnumDisplayMonitors()
+        for i, m in enumerate(monitors):
+            rect = m[2]
+            x, y, x2, y2 = rect
+            w, h = x2 - x, y2 - y
+            # Pintar un cuadro en el centro de cada monitor detectado
+            data = {
+                "action": "highlight",
+                "x": x + w//4,
+                "y": y + h//4,
+                "w": w//2,
+                "h": h//2,
+                "color": "yellow",
+                "label": f"MONITOR_{i+1}"
+            }
+            send_command(data)
+            print(f"Monitor {i+1} calibrado: {rect}")
+            import time
+            time.sleep(1.5) # Pausa para que el usuario vea cada monitor
+        print("Calibración completada.")
+
+    elif cmd == "save_template":
+        if len(sys.argv) < 7:
+            print("Usage: python main.py save_template <name> <x> <y> <w> <h>")
+            return
+        name = sys.argv[2]
+        x, y, w, h = int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]), int(sys.argv[6])
+        from PIL import ImageGrab
+        img = ImageGrab.grab(bbox=(x, y, x + w, y + h))
+        save_path = os.path.join(BASE_DIR, "templates", name + ".png")
+        img.save(save_path)
+        print(f"TEMPLATE SAVED: {save_path}")
+
+    elif cmd == "match":
+        if len(sys.argv) < 3:
+            print("Usage: python main.py match <template_name> [color] [threshold] [duration]")
+            return
+        name = sys.argv[2]
+        color = sys.argv[3] if len(sys.argv) > 3 else "green"
+        threshold = float(sys.argv[4]) if len(sys.argv) > 4 else 0.8
+        duration = float(sys.argv[5]) if len(sys.argv) > 5 else 5.0
+
+        from matcher import find_template_on_screen
+        res = find_template_on_screen(name + ".png", threshold=threshold)
+        if res:
+            x, y, w, h = res
+            send_command({
+                "action": "highlight", 
+                "x": x, "y": y, "w": w, "h": h, 
+                "color": color, 
+                "label": f"MATCH: {name}",
+                "duration": duration
+            })
+            print(f"MATCH FOUND: {res} Conf: {threshold}")
+        else:
+            print("MATCH NOT FOUND")
+
     elif cmd == "stop":
-        print("Stopping Overlay...")
-        os.system('taskkill /F /FI "WINDOWTITLE eq MIJA_Focus_Overlay" >nul 2>&1')
+        print("Stopping MIJA Components...")
+        for pid_name in ["overlay.pid", "bee.pid"]:
+            pid_path = os.path.join(BASE_DIR, pid_name)
+            if os.path.exists(pid_path):
+                try:
+                    with open(pid_path, "r") as f:
+                        pid = f.read().strip()
+                    os.system(f"taskkill /F /PID {pid} >nul 2>&1")
+                    os.remove(pid_path)
+                    print(f"Terminated {pid_name} (PID {pid})")
+                except Exception as e:
+                    print(f"Error terminating {pid_name}: {e}")
+
+        # Fallback: kill by window title (wildcard para multi-monitor)
+        os.system(
+            'powershell -Command "'
+            'Get-Process | Where-Object {$_.MainWindowTitle -like \'MIJA_Focus_Overlay*\'} '
+            '| Stop-Process -Force" >nul 2>&1'
+        )
+        os.system('taskkill /F /FI "WINDOWTITLE eq MIJA_Bee_Button" >nul 2>&1')
+
         if os.path.exists(COMMAND_FILE):
             os.remove(COMMAND_FILE)
-        print("Overlay Stopped.")
+        print("MIJA Components Stopped.")
 
 if __name__ == "__main__":
     main()
