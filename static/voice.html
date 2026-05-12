@@ -3,256 +3,507 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MIJA Accesibilidad — IArtLabs</title>
+<title>MIJA · Asistente visual por voz — IArtLabs</title>
+<meta name="description" content="MIJA es una asistente visual que apunta en tu pantalla a lo que dices. Diseñada para personas con discapacidad motriz y para agentes virtuales que te ayudan a encontrar las cosas.">
 <style>
   :root {
-    --bg: #0a0a0a;
-    --bg-2: #141414;
-    --fg: #ffffff;
-    --accent: #00ff66;
-    --accent-dim: #1a8c4a;
-    --danger: #ff3344;
-    --muted: #888;
+    --bg:           #fffbf2;
+    --bg-gradient:  linear-gradient(180deg, #fff8e7 0%, #fffbf2 100%);
+    --surface:      #ffffff;
+    --surface-alt:  #fef9ec;
+    --primary:      #d97706;
+    --primary-hov:  #b45309;
+    --primary-soft: #fde68a;
+    --primary-bg:   #fef3c7;
+    --accent:       #059669;
+    --accent-soft:  #d1fae5;
+    --danger:       #dc2626;
+    --danger-soft:  #fee2e2;
+    --text:         #1f2937;
+    --text-soft:    #4b5563;
+    --text-muted:   #9ca3af;
+    --border:       #f3e8c8;
+    --shadow-sm:    0 1px 2px rgba(217,119,6,0.05);
+    --shadow:       0 4px 16px rgba(217,119,6,0.08);
+    --shadow-lg:    0 12px 32px rgba(217,119,6,0.12);
+    --radius:       16px;
+    --radius-sm:    10px;
   }
   * { box-sizing: border-box; }
   html, body {
     margin: 0; padding: 0;
-    background: var(--bg);
-    color: var(--fg);
-    font-family: 'Consolas', 'Courier New', monospace;
+    background: var(--bg-gradient);
+    color: var(--text);
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 18px;
-    line-height: 1.5;
+    line-height: 1.6;
     min-height: 100vh;
   }
-  body {
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    max-width: 900px;
+  .wrap {
+    max-width: 980px;
     margin: 0 auto;
+    padding: 32px 24px 64px;
   }
-  header {
+
+  /* ── Header / Hero ────────────────────────────────────────────────────── */
+  header.hero {
     text-align: center;
-    padding: 16px 0;
-    border-bottom: 2px solid var(--accent-dim);
+    padding: 32px 0 24px;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    padding: 10px 20px;
+    border-radius: 999px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text-soft);
     margin-bottom: 24px;
   }
-  header h1 {
-    margin: 0;
-    font-size: 32px;
-    color: var(--accent);
-    letter-spacing: 2px;
+  .brand .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
   }
-  header .subtitle {
-    color: var(--muted);
+  h1.title {
+    margin: 0 0 12px;
+    font-size: 44px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--text);
+  }
+  h1.title .bee {
+    display: inline-block;
+    transform: translateY(-4px);
+  }
+  .tagline {
+    font-size: 22px;
+    color: var(--text-soft);
+    max-width: 640px;
+    margin: 0 auto;
+    font-weight: 400;
+  }
+
+  /* ── Audience cards ─────────────────────────────────────────────────── */
+  .audience {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 32px 0 40px;
+  }
+  @media (max-width: 720px) {
+    .audience { grid-template-columns: 1fr; }
+    h1.title { font-size: 32px; }
+    .tagline { font-size: 18px; }
+  }
+  .audience .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .audience .card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+  .audience .icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+  }
+  .audience h3 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    color: var(--text);
+    font-weight: 700;
+  }
+  .audience p {
+    margin: 0;
+    color: var(--text-soft);
     font-size: 16px;
-    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ── Main panel ─────────────────────────────────────────────────────── */
+  .panel {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
   }
   .status {
     text-align: center;
-    padding: 12px;
-    background: var(--bg-2);
-    border-radius: 8px;
+    padding: 14px 20px;
+    border-radius: var(--radius-sm);
     margin-bottom: 24px;
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 17px;
+    font-weight: 500;
     transition: all 0.3s;
+    background: var(--surface-alt);
+    color: var(--text-soft);
   }
-  .status.idle   { color: var(--muted); }
-  .status.live   { color: var(--accent); animation: pulse 1.5s infinite; }
-  .status.error  { color: var(--danger); }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
-  .controls {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    margin-bottom: 32px;
-    flex-wrap: wrap;
-  }
-  button {
-    font-family: inherit;
-    font-size: 22px;
-    padding: 20px 36px;
-    min-height: 64px;
-    min-width: 200px;
-    border: 3px solid var(--accent);
-    background: var(--bg);
+  .status.live {
+    background: var(--accent-soft);
     color: var(--accent);
-    border-radius: 12px;
-    cursor: pointer;
-    font-weight: bold;
-    letter-spacing: 1px;
-    transition: all 0.2s;
+    animation: breathe 2.5s ease-in-out infinite;
   }
-  button:hover, button:focus {
-    background: var(--accent);
-    color: var(--bg);
-    outline: 3px solid var(--accent);
-    outline-offset: 2px;
-  }
-  button.active {
-    background: var(--accent);
-    color: var(--bg);
-  }
-  button.danger {
-    border-color: var(--danger);
+  .status.error {
+    background: var(--danger-soft);
     color: var(--danger);
   }
-  button.danger:hover {
-    background: var(--danger);
-    color: var(--bg);
+  @keyframes breathe {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.75; }
   }
-  .transcript {
-    background: var(--bg-2);
-    border: 2px solid var(--accent-dim);
-    padding: 24px;
-    border-radius: 12px;
-    min-height: 100px;
-    font-size: 28px;
+
+  /* ── Mic button (hero CTA) ───────────────────────────────────────────── */
+  .mic-zone {
     text-align: center;
-    margin-bottom: 24px;
-    word-wrap: break-word;
+    padding: 24px 0;
   }
-  .transcript .last {
-    color: var(--muted);
-    font-size: 16px;
-    margin-bottom: 8px;
+  .mic-btn {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: none;
+    background: var(--primary);
+    color: white;
+    font-size: 48px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(217,119,6,0.35);
+    transition: all 0.25s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
   }
-  .transcript .text {
-    color: var(--accent);
-    font-weight: bold;
+  .mic-btn:hover { background: var(--primary-hov); transform: scale(1.04); }
+  .mic-btn:focus-visible {
+    outline: 4px solid var(--primary-soft);
+    outline-offset: 4px;
+  }
+  .mic-btn.active {
+    background: var(--accent);
+    box-shadow: 0 0 0 12px rgba(5,150,105,0.15),
+                0 0 0 24px rgba(5,150,105,0.08);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 12px rgba(5,150,105,0.15), 0 0 0 24px rgba(5,150,105,0.08); }
+    50%      { box-shadow: 0 0 0 18px rgba(5,150,105,0.20), 0 0 0 36px rgba(5,150,105,0.10); }
+  }
+  .mic-btn:disabled {
+    background: var(--text-muted);
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+  .mic-label {
+    margin-top: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .mic-hint {
+    margin-top: 4px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  /* ── Secondary buttons ──────────────────────────────────────────────── */
+  .secondary-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    font-family: inherit;
+    font-size: 15px;
+    padding: 12px 22px;
+    min-height: 48px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .btn:hover { border-color: var(--primary); color: var(--primary); }
+  .btn:focus-visible { outline: 3px solid var(--primary-soft); outline-offset: 2px; }
+  .btn.danger { color: var(--danger); }
+  .btn.danger:hover { border-color: var(--danger); background: var(--danger-soft); }
+
+  /* ── Transcript ─────────────────────────────────────────────────────── */
+  .transcript {
+    background: var(--surface-alt);
+    border-radius: var(--radius-sm);
+    padding: 20px 24px;
+    text-align: center;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+  }
+  .transcript-label {
+    color: var(--text-muted);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .transcript-text {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--primary);
+    min-height: 32px;
+  }
+
+  /* ── Grid preview ───────────────────────────────────────────────────── */
+  .grid-wrap {
+    background: var(--surface-alt);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    border: 1px solid var(--border);
+  }
+  .grid-title {
+    color: var(--text-muted);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    text-align: center;
   }
   .grid-preview {
     display: grid;
     grid-template-columns: repeat(16, 1fr);
-    gap: 2px;
-    background: var(--bg-2);
-    padding: 8px;
-    border-radius: 12px;
-    margin-bottom: 24px;
+    gap: 3px;
     aspect-ratio: 16 / 9;
   }
   .cell {
-    background: var(--bg);
-    border: 1px solid var(--accent-dim);
-    color: var(--accent-dim);
-    font-size: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 9px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 2px;
+    border-radius: 3px;
     transition: all 0.3s;
+    font-weight: 500;
   }
   .cell.hit {
-    background: var(--accent);
-    color: var(--bg);
-    font-weight: bold;
-    box-shadow: 0 0 16px var(--accent);
-    transform: scale(1.05);
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    font-weight: 700;
+    box-shadow: 0 0 0 3px var(--primary-soft);
+    transform: scale(1.1);
   }
-  .help {
-    background: var(--bg-2);
-    padding: 20px;
-    border-radius: 12px;
-    font-size: 15px;
-    line-height: 1.7;
+
+  /* ── Commands help ──────────────────────────────────────────────────── */
+  .commands-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
   }
-  .help h2 {
-    margin-top: 0;
-    color: var(--accent);
-    font-size: 20px;
+  .cmd {
+    background: var(--surface-alt);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
-  .help ul { padding-left: 20px; }
-  .help li { margin-bottom: 6px; }
-  .help code {
-    background: var(--bg);
-    padding: 2px 8px;
-    border-radius: 4px;
-    color: var(--accent);
-    font-weight: bold;
+  .cmd code {
+    background: var(--primary-bg);
+    color: var(--primary-hov);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: 'SF Mono', Consolas, monospace;
+    font-weight: 700;
+    font-size: 14px;
   }
-  .log {
+  .cmd-desc { color: var(--text-soft); font-size: 14px; }
+  h2 {
+    font-size: 22px;
+    color: var(--text);
+    margin: 0 0 12px;
+    font-weight: 700;
+  }
+  h2 .pill {
+    display: inline-block;
+    background: var(--primary-bg);
+    color: var(--primary-hov);
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-left: 8px;
+    vertical-align: middle;
+    font-weight: 600;
+  }
+
+  /* ── Log ─────────────────────────────────────────────────────────────── */
+  details.log-wrap {
     margin-top: 16px;
-    padding: 12px;
-    background: var(--bg-2);
-    border-radius: 8px;
-    font-size: 13px;
-    color: var(--muted);
-    max-height: 120px;
+    background: var(--surface-alt);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+  }
+  details.log-wrap summary {
+    cursor: pointer;
+    padding: 12px 18px;
+    color: var(--text-soft);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  details.log-wrap summary:hover { color: var(--primary); }
+  .log {
+    padding: 0 18px 14px;
+    font-size: 12px;
+    color: var(--text-soft);
+    max-height: 160px;
     overflow-y: auto;
+    font-family: 'SF Mono', Consolas, monospace;
   }
   .log .entry { padding: 2px 0; }
-  .log .ok    { color: var(--accent); }
-  .log .err   { color: var(--danger); }
+  .log .ok  { color: var(--accent); }
+  .log .err { color: var(--danger); }
+
+  /* ── Footer ──────────────────────────────────────────────────────────── */
   footer {
     text-align: center;
-    margin-top: 24px;
-    color: var(--muted);
-    font-size: 13px;
+    margin-top: 32px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  footer .signature {
+    color: var(--primary);
+    font-weight: 600;
   }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>🐝 MIJA · ACCESIBILIDAD</h1>
-  <div class="subtitle">IArtLabs — apunta tu pantalla con la voz</div>
-</header>
+<div class="wrap">
 
-<div class="status idle" id="status" aria-live="polite">
-  Listo. Pulsa <strong>INICIAR</strong> para empezar a escuchar.
+  <header class="hero">
+    <div class="brand">
+      <span class="dot"></span>
+      <span>IArtLabs · accesibilidad libre</span>
+    </div>
+    <h1 class="title"><span class="bee">🐝</span> MIJA</h1>
+    <p class="tagline">
+      Tu pantalla, a tu voz.<br>
+      Apunta donde tú digas — sin tocar nada.
+    </p>
+  </header>
+
+  <section class="audience" aria-label="Para quién es MIJA">
+    <div class="card">
+      <div class="icon" aria-hidden="true">🤖</div>
+      <h3>Para tu asistente virtual</h3>
+      <p>
+        En vez de explicarte con palabras dónde está algo, tu asistente
+        te lo <strong>señala</strong> en la pantalla. Ahorras tiempo,
+        evitas confusiones, ves antes de hacer.
+      </p>
+    </div>
+    <div class="card">
+      <div class="icon" aria-hidden="true">♿</div>
+      <h3>Para personas con discapacidad motriz</h3>
+      <p>
+        Si te cuesta usar mouse o teclado, MIJA es para ti.
+        Habla y la pantalla responde. <strong>Cero clicks, cero esfuerzo físico</strong>
+        — solo tu voz guiando la atención.
+      </p>
+    </div>
+  </section>
+
+  <section class="panel" aria-label="Control por voz">
+
+    <div class="status" id="status" aria-live="polite">
+      Listo para empezar. Pulsa el micrófono.
+    </div>
+
+    <div class="mic-zone">
+      <button id="btnMic" class="mic-btn" aria-label="Iniciar o detener escucha por voz">
+        🎤
+      </button>
+      <div class="mic-label" id="micLabel">Pulsa para empezar</div>
+      <div class="mic-hint">Te avisamos cuando esté escuchando.</div>
+    </div>
+
+    <div class="secondary-row">
+      <button id="btnClear" class="btn danger" aria-label="Quitar el señalador">
+        ✖ Quitar señalador
+      </button>
+      <button id="btnGrid" class="btn" aria-label="Mostrar u ocultar cuadrícula">
+        ⊞ Cuadrícula
+      </button>
+    </div>
+
+  </section>
+
+  <section class="panel">
+    <div class="transcript" aria-live="polite">
+      <div class="transcript-label">Último comando reconocido</div>
+      <div class="transcript-text" id="transcriptText">—</div>
+    </div>
+
+    <div class="grid-wrap" aria-hidden="true">
+      <div class="grid-title">Vista previa de la cuadrícula · columnas A → P · filas 1 → 9</div>
+      <div class="grid-preview" id="gridPreview"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Lo que puedes decir <span class="pill">en español natural</span></h2>
+    <div class="commands-grid">
+      <div class="cmd"><code>señala B3</code><span class="cmd-desc">apunta a B3</span></div>
+      <div class="cmd"><code>marca H5</code><span class="cmd-desc">mismo que arriba</span></div>
+      <div class="cmd"><code>punto C7</code><span class="cmd-desc">sinónimo</span></div>
+      <div class="cmd"><code>be tres</code><span class="cmd-desc">deletreando funciona</span></div>
+      <div class="cmd"><code>cuadrícula</code><span class="cmd-desc">muestra/oculta</span></div>
+      <div class="cmd"><code>limpia</code><span class="cmd-desc">quita el señalador</span></div>
+      <div class="cmd"><code>detente</code><span class="cmd-desc">para de escuchar</span></div>
+    </div>
+
+    <details class="log-wrap">
+      <summary>Ver registro técnico</summary>
+      <div class="log" id="log"></div>
+    </details>
+  </section>
+
+  <footer>
+    Hecho con cuidado por <span class="signature">IArtLabs</span> ·
+    MIJA Focus Overlay — accesibilidad libre y abierta
+  </footer>
+
 </div>
-
-<div class="controls">
-  <button id="btnStart" aria-label="Iniciar escucha continua">🎤 INICIAR</button>
-  <button id="btnStop"  aria-label="Detener escucha" disabled>⏸ DETENER</button>
-  <button id="btnClear" aria-label="Limpiar overlay" class="danger">✖ LIMPIAR</button>
-</div>
-
-<div class="transcript" aria-live="polite">
-  <div class="last">Último comando reconocido:</div>
-  <div class="text" id="transcriptText">—</div>
-</div>
-
-<div class="grid-preview" id="gridPreview" aria-hidden="true"></div>
-
-<div class="help">
-  <h2>Comandos por voz</h2>
-  <ul>
-    <li><code>señala B3</code> — apunta a la celda B3</li>
-    <li><code>marca C7</code> · <code>punto H5</code> · <code>apunta D4</code> — sinónimos válidos</li>
-    <li><code>cuadrícula</code> · <code>rejilla</code> — mostrar/ocultar la cuadrícula</li>
-    <li><code>limpia</code> · <code>borra</code> · <code>quita</code> — quitar el señalador</li>
-    <li><code>detente</code> · <code>para</code> · <code>fin</code> — detener escucha</li>
-  </ul>
-  <p style="margin-top: 16px; color: var(--muted);">
-    Columnas: <strong>A → P</strong>  ·  Filas: <strong>1 → 9</strong>.
-    Puedes decir letra-número juntos ("B3") o por separado ("be tres").
-  </p>
-</div>
-
-<div class="log" id="log" aria-live="off"></div>
-
-<footer>
-  MIJA Focus Overlay · IArtLabs · accesibilidad libre
-</footer>
 
 <script>
 const API = window.location.origin;
 
 const $ = (id) => document.getElementById(id);
-const statusEl    = $("status");
-const transcript  = $("transcriptText");
-const logEl       = $("log");
-const btnStart    = $("btnStart");
-const btnStop     = $("btnStop");
-const btnClear    = $("btnClear");
-const gridPreview = $("gridPreview");
+const statusEl   = $("status");
+const transcript = $("transcriptText");
+const logEl      = $("log");
+const btnMic     = $("btnMic");
+const btnClear   = $("btnClear");
+const btnGrid    = $("btnGrid");
+const micLabel   = $("micLabel");
+const gridPrev   = $("gridPreview");
 
-// ── Build the 16×9 grid preview ────────────────────────────────────────────
+// ── Build the 16×9 grid preview ───────────────────────────────────────────
 const COLS = "ABCDEFGHIJKLMNOP";
 const cells = {};
 for (let r = 1; r <= 9; r++) {
@@ -261,33 +512,32 @@ for (let r = 1; r <= 9; r++) {
     const div = document.createElement("div");
     div.className = "cell";
     div.textContent = name;
-    div.id = "cell-" + name;
     cells[name] = div;
-    gridPreview.appendChild(div);
+    gridPrev.appendChild(div);
   }
 }
 
-// ── Logging ────────────────────────────────────────────────────────────────
+// ── Logging ───────────────────────────────────────────────────────────────
 function log(msg, level = "") {
   const entry = document.createElement("div");
   entry.className = "entry " + level;
   const ts = new Date().toLocaleTimeString();
   entry.textContent = `[${ts}] ${msg}`;
   logEl.prepend(entry);
-  while (logEl.children.length > 30) logEl.removeChild(logEl.lastChild);
+  while (logEl.children.length > 40) logEl.removeChild(logEl.lastChild);
 }
 
-// ── Speech synthesis (audio feedback) ──────────────────────────────────────
+// ── Audio feedback ────────────────────────────────────────────────────────
 function speak(text) {
   if (!("speechSynthesis" in window)) return;
   const u = new SpeechSynthesisUtterance(text);
   u.lang = "es-MX";
   u.rate = 1.1;
-  u.volume = 0.7;
+  u.volume = 0.6;
   window.speechSynthesis.speak(u);
 }
 
-// ── Spanish number/letter parsing ──────────────────────────────────────────
+// ── Spanish number/letter parsing ─────────────────────────────────────────
 const SPELLED_LETTER = {
   "a": "A",
   "be": "B", "ve": "B", "b": "B",
@@ -321,18 +571,16 @@ const SPELLED_NUMBER = {
 function normalize(text) {
   return text
     .toLowerCase()
-    .normalize("NFD").replace(/[̀-ͯ]/g, "")  // strip accents
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
     .replace(/[^\w\s]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
 
 function parseCell(text) {
-  // Direct match like "b3" or "h5"
   const direct = text.match(/\b([a-p])\s*([1-9])\b/i);
   if (direct) return (direct[1] + direct[2]).toUpperCase();
 
-  // Spelled out: "be tres" / "be 3"
   const tokens = normalize(text).split(" ");
   for (let i = 0; i < tokens.length - 1; i++) {
     const letter = SPELLED_LETTER[tokens[i]];
@@ -344,14 +592,13 @@ function parseCell(text) {
   return null;
 }
 
-// ── Command dispatch ───────────────────────────────────────────────────────
+// ── Command dispatch ──────────────────────────────────────────────────────
 async function highlightCell(cell) {
-  // Update preview
   Object.values(cells).forEach((c) => c.classList.remove("hit"));
   if (cells[cell]) cells[cell].classList.add("hit");
 
-  transcript.textContent = `→ ${cell}`;
-  log(`POST /highlight/cell  ${cell}`);
+  transcript.textContent = cell;
+  log(`Apuntando a ${cell}`);
   speak(cell);
 
   try {
@@ -360,17 +607,17 @@ async function highlightCell(cell) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         cell: cell,
-        color: "#00ff66",
-        label: `VOZ: ${cell}`,
+        color: "#d97706",
+        label: cell,
         duration: 8.0,
-        monitor: 0,            // 0 = auto-primary
+        monitor: 0,
       }),
     });
     const data = await r.json();
     log(`✓ ${cell} en monitor ${data.monitor}`, "ok");
   } catch (e) {
     log(`✗ ${e.message}`, "err");
-    speak("error de red");
+    speak("error de conexión");
   }
 }
 
@@ -387,39 +634,28 @@ function dispatchPhrase(raw) {
   const text = normalize(raw);
   transcript.textContent = raw;
 
-  // Stop commands
-  if (/\b(detente|para|fin|alto|stop)\b/.test(text)) {
+  if (/\b(detente|para|fin|alto|stop|detener)\b/.test(text)) {
     speak("escucha detenida");
     stopListening();
     return;
   }
-
-  // Clear
   if (/\b(limpia|borra|quita|clear|limpiar)\b/.test(text)) {
     apiPost("/clear");
     Object.values(cells).forEach((c) => c.classList.remove("hit"));
     speak("limpio");
     return;
   }
-
-  // Grid toggle
   if (/\b(rejilla|cuadricula|grid|cuadrilla)\b/.test(text)) {
     apiPost("/grid/toggle");
     speak("cuadricula");
     return;
   }
-
-  // Cell highlight
   const cell = parseCell(text);
-  if (cell) {
-    highlightCell(cell);
-    return;
-  }
-
-  log(`? no entendí: "${raw}"`, "err");
+  if (cell) { highlightCell(cell); return; }
+  log(`No entendí: "${raw}"`, "err");
 }
 
-// ── SpeechRecognition setup ────────────────────────────────────────────────
+// ── SpeechRecognition ─────────────────────────────────────────────────────
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
 let listening = false;
@@ -427,8 +663,8 @@ let listening = false;
 function buildRecognition() {
   if (!SR) {
     statusEl.className = "status error";
-    statusEl.innerHTML = "⚠ Tu navegador no soporta reconocimiento de voz. Usa Edge o Chrome.";
-    btnStart.disabled = true;
+    statusEl.innerHTML = "⚠ Tu navegador no soporta reconocimiento de voz. Abre esta página en <strong>Edge</strong> o <strong>Chrome</strong>.";
+    btnMic.disabled = true;
     return null;
   }
   const r = new SR();
@@ -447,18 +683,15 @@ function buildRecognition() {
     }
   };
   r.onerror = (ev) => {
-    log(`✗ STT error: ${ev.error}`, "err");
+    log(`STT error: ${ev.error}`, "err");
     if (ev.error === "not-allowed" || ev.error === "service-not-allowed") {
       statusEl.className = "status error";
-      statusEl.innerHTML = "⚠ Permiso de micrófono denegado.";
+      statusEl.innerHTML = "⚠ Permiso de micrófono denegado. Permítelo en el ícono junto a la URL.";
       stopListening();
     }
   };
   r.onend = () => {
-    // Browser sometimes auto-stops continuous mode — restart if still wanted.
-    if (listening) {
-      try { r.start(); } catch (_) {}
-    }
+    if (listening) { try { r.start(); } catch (_) {} }
   };
   return r;
 }
@@ -467,49 +700,57 @@ function startListening() {
   if (!recognition) recognition = buildRecognition();
   if (!recognition) return;
   listening = true;
-  try {
-    recognition.start();
-  } catch (e) {
-    log(`✗ start: ${e.message}`, "err");
-  }
+  try { recognition.start(); }
+  catch (e) { log(`start: ${e.message}`, "err"); }
   statusEl.className = "status live";
-  statusEl.innerHTML = "🎤 ESCUCHANDO… habla cuando quieras.";
-  btnStart.disabled = true;
-  btnStart.classList.add("active");
-  btnStop.disabled = false;
-  speak("escuchando");
+  statusEl.innerHTML = "🎧 Escuchando — habla con calma, te entiendo.";
+  btnMic.classList.add("active");
+  micLabel.textContent = "Pulsa para detener";
+  speak("te escucho");
 }
 
 function stopListening() {
   listening = false;
-  if (recognition) {
-    try { recognition.stop(); } catch (_) {}
-  }
-  statusEl.className = "status idle";
-  statusEl.innerHTML = "Detenido. Pulsa <strong>INICIAR</strong> para volver a escuchar.";
-  btnStart.disabled = false;
-  btnStart.classList.remove("active");
-  btnStop.disabled = true;
+  if (recognition) { try { recognition.stop(); } catch (_) {} }
+  statusEl.className = "status";
+  statusEl.innerHTML = "Detenido. Pulsa el micrófono para volver a escuchar.";
+  btnMic.classList.remove("active");
+  micLabel.textContent = "Pulsa para empezar";
 }
 
-// ── Button wiring ──────────────────────────────────────────────────────────
-btnStart.addEventListener("click", startListening);
-btnStop.addEventListener("click",  stopListening);
+function toggleListening() {
+  if (listening) stopListening();
+  else startListening();
+}
+
+// ── Wire UI ───────────────────────────────────────────────────────────────
+btnMic.addEventListener("click", toggleListening);
 btnClear.addEventListener("click", () => {
   apiPost("/clear");
   Object.values(cells).forEach((c) => c.classList.remove("hit"));
   transcript.textContent = "—";
 });
+btnGrid.addEventListener("click", () => apiPost("/grid/toggle"));
 
-// ── Boot ───────────────────────────────────────────────────────────────────
-log("MIJA accesibilidad cargada. Edge/Chrome → permitir micrófono.");
-fetch(`${API}/status`).then((r) => r.json()).then((s) => {
-  if (s.components?.overlay === "running") {
-    log("✓ overlay activo", "ok");
-  } else {
-    log("⚠ overlay parado — corre MIJA_SEÑALADORA.bat", "err");
+// Keyboard: spacebar toggles listening (great for switch devices)
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Space" && !["INPUT","TEXTAREA"].includes(document.activeElement.tagName)) {
+    e.preventDefault();
+    toggleListening();
   }
 });
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+log("MIJA cargada. Permite el micrófono cuando lo pida.");
+fetch(`${API}/status`).then((r) => r.json()).then((s) => {
+  if (s.components?.overlay === "running") {
+    log("Overlay activo", "ok");
+  } else {
+    log("Overlay parado — corre MIJA_SEÑALADORA.bat", "err");
+    statusEl.className = "status error";
+    statusEl.innerHTML = "⚠ El señalador no está corriendo. Abre <code>MIJA_SEÑALADORA.bat</code> primero.";
+  }
+}).catch(() => log("API offline", "err"));
 </script>
 </body>
 </html>
