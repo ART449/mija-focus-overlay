@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MIJA · Asistente visual por voz — IArtLabs</title>
-<meta name="description" content="MIJA es una asistente visual que apunta en tu pantalla a lo que dices. Diseñada para personas con discapacidad motriz y para agentes virtuales que te ayudan a encontrar las cosas.">
+<meta name="description" content="MIJA es una asistente visual que apunta y hace click por ti en la pantalla. Diseñada para personas con discapacidad motriz y para asistentes virtuales que te ayudan a encontrar las cosas.">
 <style>
   :root {
     --bg:           #fffbf2;
@@ -17,6 +17,8 @@
     --primary-bg:   #fef3c7;
     --accent:       #059669;
     --accent-soft:  #d1fae5;
+    --info:         #0891b2;
+    --info-soft:    #cffafe;
     --danger:       #dc2626;
     --danger-soft:  #fee2e2;
     --text:         #1f2937;
@@ -45,15 +47,10 @@
     padding: 32px 24px 64px;
   }
 
-  /* ── Header / Hero ────────────────────────────────────────────────────── */
-  header.hero {
-    text-align: center;
-    padding: 32px 0 24px;
-  }
+  /* ── Header / Hero ──────────────────────────────────────────────────── */
+  header.hero { text-align: center; padding: 32px 0 24px; }
   .brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
+    display: inline-flex; align-items: center; gap: 12px;
     background: var(--surface);
     padding: 10px 20px;
     border-radius: 999px;
@@ -63,26 +60,13 @@
     color: var(--text-soft);
     margin-bottom: 24px;
   }
-  .brand .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--accent);
-  }
-  h1.title {
-    margin: 0 0 12px;
-    font-size: 44px;
-    font-weight: 800;
-    letter-spacing: -1px;
-    color: var(--text);
-  }
-  h1.title .bee {
-    display: inline-block;
-    transform: translateY(-4px);
-  }
+  .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  h1.title { margin: 0 0 12px; font-size: 44px; font-weight: 800; letter-spacing: -1px; }
+  h1.title .bee { display: inline-block; transform: translateY(-4px); }
   .tagline {
     font-size: 22px;
     color: var(--text-soft);
-    max-width: 640px;
+    max-width: 700px;
     margin: 0 auto;
     font-weight: 400;
   }
@@ -107,28 +91,12 @@
     box-shadow: var(--shadow-sm);
     transition: transform 0.2s, box-shadow 0.2s;
   }
-  .audience .card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
-  }
-  .audience .icon {
-    font-size: 36px;
-    margin-bottom: 12px;
-  }
-  .audience h3 {
-    margin: 0 0 8px;
-    font-size: 20px;
-    color: var(--text);
-    font-weight: 700;
-  }
-  .audience p {
-    margin: 0;
-    color: var(--text-soft);
-    font-size: 16px;
-    line-height: 1.5;
-  }
+  .audience .card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+  .audience .icon { font-size: 36px; margin-bottom: 12px; }
+  .audience h3 { margin: 0 0 8px; font-size: 20px; font-weight: 700; }
+  .audience p { margin: 0; color: var(--text-soft); font-size: 16px; line-height: 1.5; }
 
-  /* ── Main panel ─────────────────────────────────────────────────────── */
+  /* ── Panels ─────────────────────────────────────────────────────────── */
   .panel {
     background: var(--surface);
     border-radius: var(--radius);
@@ -148,28 +116,15 @@
     background: var(--surface-alt);
     color: var(--text-soft);
   }
-  .status.live {
-    background: var(--accent-soft);
-    color: var(--accent);
-    animation: breathe 2.5s ease-in-out infinite;
-  }
-  .status.error {
-    background: var(--danger-soft);
-    color: var(--danger);
-  }
-  @keyframes breathe {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.75; }
-  }
+  .status.live    { background: var(--accent-soft); color: var(--accent); animation: breathe 2.5s ease-in-out infinite; }
+  .status.action  { background: var(--info-soft);   color: var(--info); }
+  .status.error   { background: var(--danger-soft); color: var(--danger); }
+  @keyframes breathe { 0%, 100% { opacity: 1; } 50% { opacity: 0.75; } }
 
-  /* ── Mic button (hero CTA) ───────────────────────────────────────────── */
-  .mic-zone {
-    text-align: center;
-    padding: 24px 0;
-  }
+  /* ── Mic button ─────────────────────────────────────────────────────── */
+  .mic-zone { text-align: center; padding: 24px 0; }
   .mic-btn {
-    width: 140px;
-    height: 140px;
+    width: 140px; height: 140px;
     border-radius: 50%;
     border: none;
     background: var(--primary);
@@ -181,48 +136,25 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    position: relative;
   }
   .mic-btn:hover { background: var(--primary-hov); transform: scale(1.04); }
-  .mic-btn:focus-visible {
-    outline: 4px solid var(--primary-soft);
-    outline-offset: 4px;
-  }
+  .mic-btn:focus-visible { outline: 4px solid var(--primary-soft); outline-offset: 4px; }
   .mic-btn.active {
     background: var(--accent);
-    box-shadow: 0 0 0 12px rgba(5,150,105,0.15),
-                0 0 0 24px rgba(5,150,105,0.08);
+    box-shadow: 0 0 0 12px rgba(5,150,105,0.15), 0 0 0 24px rgba(5,150,105,0.08);
     animation: pulse 2s infinite;
   }
   @keyframes pulse {
     0%, 100% { box-shadow: 0 0 0 12px rgba(5,150,105,0.15), 0 0 0 24px rgba(5,150,105,0.08); }
     50%      { box-shadow: 0 0 0 18px rgba(5,150,105,0.20), 0 0 0 36px rgba(5,150,105,0.10); }
   }
-  .mic-btn:disabled {
-    background: var(--text-muted);
-    cursor: not-allowed;
-    box-shadow: none;
-    transform: none;
-  }
-  .mic-label {
-    margin-top: 16px;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text);
-  }
-  .mic-hint {
-    margin-top: 4px;
-    color: var(--text-muted);
-    font-size: 14px;
-  }
+  .mic-btn:disabled { background: var(--text-muted); cursor: not-allowed; box-shadow: none; transform: none; }
+  .mic-label { margin-top: 16px; font-size: 18px; font-weight: 600; color: var(--text); }
+  .mic-hint  { margin-top: 4px;  color: var(--text-muted); font-size: 14px; }
 
-  /* ── Secondary buttons ──────────────────────────────────────────────── */
   .secondary-row {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    margin-top: 24px;
-    flex-wrap: wrap;
+    display: flex; gap: 12px; justify-content: center;
+    margin-top: 24px; flex-wrap: wrap;
   }
   .btn {
     font-family: inherit;
@@ -242,8 +174,8 @@
   .btn.danger { color: var(--danger); }
   .btn.danger:hover { border-color: var(--danger); background: var(--danger-soft); }
 
-  /* ── Transcript ─────────────────────────────────────────────────────── */
-  .transcript {
+  /* ── Last action card ───────────────────────────────────────────────── */
+  .last-action {
     background: var(--surface-alt);
     border-radius: var(--radius-sm);
     padding: 20px 24px;
@@ -251,18 +183,28 @@
     margin-bottom: 16px;
     border: 1px solid var(--border);
   }
-  .transcript-label {
+  .la-label {
     color: var(--text-muted);
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
-  .transcript-text {
-    font-size: 24px;
-    font-weight: 600;
+  .la-action {
+    font-size: 16px;
+    color: var(--text-soft);
+    margin-bottom: 4px;
+  }
+  .la-target {
+    font-size: 28px;
+    font-weight: 700;
     color: var(--primary);
-    min-height: 32px;
+  }
+  .la-target .verb {
+    color: var(--text-muted);
+    font-size: 18px;
+    font-weight: 500;
+    margin-right: 8px;
   }
 
   /* ── Grid preview ───────────────────────────────────────────────────── */
@@ -306,39 +248,84 @@
     box-shadow: 0 0 0 3px var(--primary-soft);
     transform: scale(1.1);
   }
+  .cell.click-flash {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    animation: click-bounce 0.6s ease-out;
+  }
+  @keyframes click-bounce {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.3); }
+    100% { transform: scale(1.1); }
+  }
+
+  /* ── Sub-grid legend ────────────────────────────────────────────────── */
+  .subgrid-legend {
+    margin-top: 12px;
+    text-align: center;
+  }
+  .subgrid-legend .title {
+    font-size: 13px; color: var(--text-muted); margin-bottom: 6px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .subgrid-mini {
+    display: inline-grid;
+    grid-template-columns: repeat(4, 32px);
+    grid-template-rows: repeat(3, 32px);
+    gap: 4px;
+    background: var(--primary-bg);
+    padding: 6px;
+    border-radius: 8px;
+  }
+  .subgrid-mini .sub {
+    background: var(--surface);
+    border: 1px solid var(--primary-soft);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600;
+    color: var(--primary-hov);
+  }
 
   /* ── Commands help ──────────────────────────────────────────────────── */
+  .cmd-section { margin-bottom: 20px; }
+  .cmd-section:last-child { margin-bottom: 0; }
+  .cmd-section .label {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
   .commands-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 12px;
-    margin-top: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
   }
   .cmd {
     background: var(--surface-alt);
     border-radius: var(--radius-sm);
-    padding: 14px 16px;
+    padding: 12px 14px;
     border: 1px solid var(--border);
     display: flex;
     align-items: center;
     gap: 10px;
+    font-size: 14px;
   }
   .cmd code {
     background: var(--primary-bg);
     color: var(--primary-hov);
-    padding: 4px 10px;
+    padding: 3px 10px;
     border-radius: 6px;
     font-family: 'SF Mono', Consolas, monospace;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
+    white-space: nowrap;
   }
-  .cmd-desc { color: var(--text-soft); font-size: 14px; }
-  h2 {
-    font-size: 22px;
-    color: var(--text);
-    margin: 0 0 12px;
-    font-weight: 700;
-  }
+  .cmd-desc { color: var(--text-soft); }
+  h2 { font-size: 22px; margin: 0 0 12px; font-weight: 700; }
   h2 .pill {
     display: inline-block;
     background: var(--primary-bg);
@@ -370,25 +357,22 @@
     padding: 0 18px 14px;
     font-size: 12px;
     color: var(--text-soft);
-    max-height: 160px;
+    max-height: 180px;
     overflow-y: auto;
     font-family: 'SF Mono', Consolas, monospace;
   }
   .log .entry { padding: 2px 0; }
   .log .ok  { color: var(--accent); }
   .log .err { color: var(--danger); }
+  .log .act { color: var(--info); font-weight: 600; }
 
-  /* ── Footer ──────────────────────────────────────────────────────────── */
   footer {
     text-align: center;
     margin-top: 32px;
     color: var(--text-muted);
     font-size: 14px;
   }
-  footer .signature {
-    color: var(--primary);
-    font-weight: 600;
-  }
+  footer .signature { color: var(--primary); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -403,7 +387,7 @@
     <h1 class="title"><span class="bee">🐝</span> MIJA</h1>
     <p class="tagline">
       Tu pantalla, a tu voz.<br>
-      Apunta donde tú digas — sin tocar nada.
+      Apunta, haz click y arrastra — todo sin tocar nada.
     </p>
   </header>
 
@@ -413,31 +397,29 @@
       <h3>Para tu asistente virtual</h3>
       <p>
         En vez de explicarte con palabras dónde está algo, tu asistente
-        te lo <strong>señala</strong> en la pantalla. Ahorras tiempo,
-        evitas confusiones, ves antes de hacer.
+        te lo <strong>señala</strong> en la pantalla. Y si lo autorizas,
+        también puede <strong>hacer click por ti</strong>.
       </p>
     </div>
     <div class="card">
       <div class="icon" aria-hidden="true">♿</div>
       <h3>Para personas con discapacidad motriz</h3>
       <p>
-        Si te cuesta usar mouse o teclado, MIJA es para ti.
-        Habla y la pantalla responde. <strong>Cero clicks, cero esfuerzo físico</strong>
-        — solo tu voz guiando la atención.
+        Habla y la pantalla responde. Hacer click, doble click, arrastrar,
+        hacer scroll — <strong>todo con tu voz</strong>. Sin mouse, sin teclado,
+        sin esfuerzo físico.
       </p>
     </div>
   </section>
 
-  <section class="panel" aria-label="Control por voz">
+  <section class="panel">
 
     <div class="status" id="status" aria-live="polite">
       Listo para empezar. Pulsa el micrófono.
     </div>
 
     <div class="mic-zone">
-      <button id="btnMic" class="mic-btn" aria-label="Iniciar o detener escucha por voz">
-        🎤
-      </button>
+      <button id="btnMic" class="mic-btn" aria-label="Iniciar o detener escucha por voz">🎤</button>
       <div class="mic-label" id="micLabel">Pulsa para empezar</div>
       <div class="mic-hint">Te avisamos cuando esté escuchando.</div>
     </div>
@@ -454,27 +436,66 @@
   </section>
 
   <section class="panel">
-    <div class="transcript" aria-live="polite">
-      <div class="transcript-label">Último comando reconocido</div>
-      <div class="transcript-text" id="transcriptText">—</div>
+    <div class="last-action" aria-live="polite">
+      <div class="la-label">Última acción</div>
+      <div class="la-action" id="laAction">esperando tu voz…</div>
+      <div class="la-target" id="laTarget">—</div>
     </div>
 
     <div class="grid-wrap" aria-hidden="true">
-      <div class="grid-title">Vista previa de la cuadrícula · columnas A → P · filas 1 → 9</div>
+      <div class="grid-title">Vista previa · columnas A → P · filas 1 → 9</div>
       <div class="grid-preview" id="gridPreview"></div>
+
+      <div class="subgrid-legend">
+        <div class="title">Sub-celdas (di "B3 punto 5" o "B3 botón 5")</div>
+        <div class="subgrid-mini">
+          <div class="sub">1</div><div class="sub">2</div><div class="sub">3</div><div class="sub">4</div>
+          <div class="sub">5</div><div class="sub">6</div><div class="sub">7</div><div class="sub">8</div>
+          <div class="sub">9</div><div class="sub">10</div><div class="sub">11</div><div class="sub">12</div>
+        </div>
+      </div>
     </div>
   </section>
 
   <section class="panel">
     <h2>Lo que puedes decir <span class="pill">en español natural</span></h2>
-    <div class="commands-grid">
-      <div class="cmd"><code>señala B3</code><span class="cmd-desc">apunta a B3</span></div>
-      <div class="cmd"><code>marca H5</code><span class="cmd-desc">mismo que arriba</span></div>
-      <div class="cmd"><code>punto C7</code><span class="cmd-desc">sinónimo</span></div>
-      <div class="cmd"><code>be tres</code><span class="cmd-desc">deletreando funciona</span></div>
-      <div class="cmd"><code>cuadrícula</code><span class="cmd-desc">muestra/oculta</span></div>
-      <div class="cmd"><code>limpia</code><span class="cmd-desc">quita el señalador</span></div>
-      <div class="cmd"><code>detente</code><span class="cmd-desc">para de escuchar</span></div>
+
+    <div class="cmd-section">
+      <div class="label">Señalar (solo visual)</div>
+      <div class="commands-grid">
+        <div class="cmd"><code>señala B3</code><span class="cmd-desc">marca la celda B3</span></div>
+        <div class="cmd"><code>marca H5</code><span class="cmd-desc">igual que señala</span></div>
+        <div class="cmd"><code>apunta C7</code><span class="cmd-desc">sinónimo</span></div>
+      </div>
+    </div>
+
+    <div class="cmd-section">
+      <div class="label">Hacer click 🖱️</div>
+      <div class="commands-grid">
+        <div class="cmd"><code>haz click en B3</code><span class="cmd-desc">click izquierdo</span></div>
+        <div class="cmd"><code>doble click H5</code><span class="cmd-desc">o "abre H5"</span></div>
+        <div class="cmd"><code>click derecho C7</code><span class="cmd-desc">menú contextual</span></div>
+        <div class="cmd"><code>B3 punto 5</code><span class="cmd-desc">sub-celda dentro</span></div>
+      </div>
+    </div>
+
+    <div class="cmd-section">
+      <div class="label">Arrastrar y scroll</div>
+      <div class="commands-grid">
+        <div class="cmd"><code>desliza de B3 a F7</code><span class="cmd-desc">arrastre</span></div>
+        <div class="cmd"><code>arrastra A2 hasta H5</code><span class="cmd-desc">igual que desliza</span></div>
+        <div class="cmd"><code>scroll arriba</code><span class="cmd-desc">desplaza arriba</span></div>
+        <div class="cmd"><code>scroll abajo</code><span class="cmd-desc">desplaza abajo</span></div>
+      </div>
+    </div>
+
+    <div class="cmd-section">
+      <div class="label">Control</div>
+      <div class="commands-grid">
+        <div class="cmd"><code>cuadrícula</code><span class="cmd-desc">muestra/oculta</span></div>
+        <div class="cmd"><code>limpia</code><span class="cmd-desc">quita el señalador</span></div>
+        <div class="cmd"><code>detente</code><span class="cmd-desc">para de escuchar</span></div>
+      </div>
     </div>
 
     <details class="log-wrap">
@@ -492,10 +513,10 @@
 
 <script>
 const API = window.location.origin;
-
 const $ = (id) => document.getElementById(id);
 const statusEl   = $("status");
-const transcript = $("transcriptText");
+const laAction   = $("laAction");
+const laTarget   = $("laTarget");
 const logEl      = $("log");
 const btnMic     = $("btnMic");
 const btnClear   = $("btnClear");
@@ -503,7 +524,7 @@ const btnGrid    = $("btnGrid");
 const micLabel   = $("micLabel");
 const gridPrev   = $("gridPreview");
 
-// ── Build the 16×9 grid preview ───────────────────────────────────────────
+// ── Build grid preview ───────────────────────────────────────────────────
 const COLS = "ABCDEFGHIJKLMNOP";
 const cells = {};
 for (let r = 1; r <= 9; r++) {
@@ -517,27 +538,43 @@ for (let r = 1; r <= 9; r++) {
   }
 }
 
-// ── Logging ───────────────────────────────────────────────────────────────
+function clearCellMarks() {
+  Object.values(cells).forEach((c) => {
+    c.classList.remove("hit", "click-flash");
+  });
+}
+function markCell(cell, mode = "hit") {
+  clearCellMarks();
+  if (cells[cell]) cells[cell].classList.add(mode);
+}
+
+// ── Logging ──────────────────────────────────────────────────────────────
 function log(msg, level = "") {
   const entry = document.createElement("div");
   entry.className = "entry " + level;
   const ts = new Date().toLocaleTimeString();
   entry.textContent = `[${ts}] ${msg}`;
   logEl.prepend(entry);
-  while (logEl.children.length > 40) logEl.removeChild(logEl.lastChild);
+  while (logEl.children.length > 50) logEl.removeChild(logEl.lastChild);
 }
 
-// ── Audio feedback ────────────────────────────────────────────────────────
+// ── Audio feedback ───────────────────────────────────────────────────────
 function speak(text) {
   if (!("speechSynthesis" in window)) return;
   const u = new SpeechSynthesisUtterance(text);
   u.lang = "es-MX";
-  u.rate = 1.1;
-  u.volume = 0.6;
+  u.rate = 1.15;
+  u.volume = 0.65;
   window.speechSynthesis.speak(u);
 }
 
-// ── Spanish number/letter parsing ─────────────────────────────────────────
+// ── UI feedback ──────────────────────────────────────────────────────────
+function showAction(action, target) {
+  laAction.textContent = action;
+  laTarget.innerHTML = target;
+}
+
+// ── Spanish parsing ──────────────────────────────────────────────────────
 const SPELLED_LETTER = {
   "a": "A",
   "be": "B", "ve": "B", "b": "B",
@@ -558,14 +595,9 @@ const SPELLED_LETTER = {
 };
 const SPELLED_NUMBER = {
   "uno": 1, "un": 1,
-  "dos": 2,
-  "tres": 3,
-  "cuatro": 4,
-  "cinco": 5,
-  "seis": 6,
-  "siete": 7,
-  "ocho": 8,
-  "nueve": 9,
+  "dos": 2, "tres": 3, "cuatro": 4, "cinco": 5,
+  "seis": 6, "siete": 7, "ocho": 8, "nueve": 9,
+  "diez": 10, "once": 11, "doce": 12,
 };
 
 function normalize(text) {
@@ -577,85 +609,185 @@ function normalize(text) {
     .trim();
 }
 
-function parseCell(text) {
-  const direct = text.match(/\b([a-p])\s*([1-9])\b/i);
-  if (direct) return (direct[1] + direct[2]).toUpperCase();
+function extractAllCells(text) {
+  const n = normalize(text);
+  const found = [];
 
-  const tokens = normalize(text).split(" ");
+  // Direct: B3, b3, B 3
+  const re = /\b([a-p])\s*([1-9])\b/g;
+  let m;
+  while ((m = re.exec(n)) !== null) {
+    found.push({ cell: (m[1] + m[2]).toUpperCase(), idx: m.index });
+  }
+
+  // Spelled
+  const tokens = n.split(" ");
+  let pos = 0;
   for (let i = 0; i < tokens.length - 1; i++) {
     const letter = SPELLED_LETTER[tokens[i]];
-    if (!letter) continue;
     const next = tokens[i + 1];
-    const num = SPELLED_NUMBER[next] || parseInt(next, 10);
-    if (num >= 1 && num <= 9) return letter + num;
+    const num = SPELLED_NUMBER[next] !== undefined
+      ? SPELLED_NUMBER[next]
+      : parseInt(next, 10);
+    if (letter && num >= 1 && num <= 9) {
+      found.push({ cell: letter + num, idx: pos });
+    }
+    pos += tokens[i].length + 1;
   }
-  return null;
+  found.sort((a, b) => a.idx - b.idx);
+  // dedupe consecutive identical cells (regex + spelled can double-match)
+  const out = [];
+  for (const f of found) {
+    if (!out.length || out[out.length - 1] !== f.cell) out.push(f.cell);
+  }
+  return out;
 }
 
-// ── Command dispatch ──────────────────────────────────────────────────────
-async function highlightCell(cell) {
-  Object.values(cells).forEach((c) => c.classList.remove("hit"));
-  if (cells[cell]) cells[cell].classList.add("hit");
+function parseCellAndSub(text) {
+  const n = normalize(text);
+  const cells = extractAllCells(text);
+  if (!cells.length) return null;
+  const cell = cells[0];
 
-  transcript.textContent = cell;
-  log(`Apuntando a ${cell}`);
-  speak(cell);
+  // Sub-cell: "punto/numero/boton N"
+  const subRe = /\b(?:punto|numero|boton|subcelda|posicion)\s+(\d{1,2}|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce)\b/;
+  const sm = n.match(subRe);
+  let sub = 0;
+  if (sm) {
+    sub = SPELLED_NUMBER[sm[1]] !== undefined ? SPELLED_NUMBER[sm[1]] : parseInt(sm[1], 10);
+    if (sub < 1 || sub > 12) sub = 0;
+  }
+  return { cell, sub };
+}
 
+// ── Action dispatch ──────────────────────────────────────────────────────
+async function apiPost(path, body = null) {
+  log(`POST ${path} ${body ? JSON.stringify(body) : ""}`);
   try {
-    const r = await fetch(`${API}/highlight/cell`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        cell: cell,
-        color: "#d97706",
-        label: cell,
-        duration: 8.0,
-        monitor: 0,
-      }),
-    });
-    const data = await r.json();
-    log(`✓ ${cell} en monitor ${data.monitor}`, "ok");
+    const opts = { method: "POST" };
+    if (body) {
+      opts.headers = { "Content-Type": "application/json" };
+      opts.body = JSON.stringify(body);
+    }
+    const r = await fetch(`${API}${path}`, opts);
+    return await r.json();
   } catch (e) {
     log(`✗ ${e.message}`, "err");
     speak("error de conexión");
+    return null;
   }
 }
 
-async function apiPost(path) {
-  log(`POST ${path}`);
-  try {
-    await fetch(`${API}${path}`, { method: "POST" });
-  } catch (e) {
-    log(`✗ ${e.message}`, "err");
-  }
+async function actHighlight(cell, sub = 0) {
+  markCell(cell, "hit");
+  const label = sub ? `${cell}.${sub}` : cell;
+  showAction("Señalando", label);
+  speak(label.replace(".", " punto "));
+  await apiPost("/highlight/cell", {
+    cell, color: "#d97706", label, duration: 8.0, monitor: 0,
+  });
+  log(`✓ señalado ${label}`, "ok");
+}
+
+async function actClick(cell, sub = 0, button = "left", double = false) {
+  markCell(cell, "click-flash");
+  const verb = double ? "Doble click" : (button === "right" ? "Click derecho" : "Click");
+  const target = sub ? `${cell}.${sub}` : cell;
+  showAction(verb, target);
+  speak(`${verb.toLowerCase()} en ${target.replace(".", " punto ")}`);
+  const r = await apiPost("/click", {
+    cell, sub, button, double, monitor: 0, flash: true,
+  });
+  if (r?.status === "success") log(`✓ ${verb} → ${target} (${r.x},${r.y})`, "act");
+}
+
+async function actDrag(fromCell, toCell) {
+  showAction("Arrastrando", `${fromCell} → ${toCell}`);
+  speak(`arrastrar de ${fromCell} a ${toCell}`);
+  const r = await apiPost("/drag", {
+    from_cell: fromCell, to_cell: toCell, monitor: 0, duration: 0.5, flash: true,
+  });
+  if (r?.status === "success") log(`✓ drag ${fromCell} → ${toCell}`, "act");
+}
+
+async function actScroll(direction, cell = "H5") {
+  showAction(`Scroll ${direction === "up" ? "arriba" : "abajo"}`, cell);
+  speak(`scroll ${direction === "up" ? "arriba" : "abajo"}`);
+  await apiPost("/scroll", { cell, direction, clicks: 3, monitor: 0 });
 }
 
 function dispatchPhrase(raw) {
   const text = normalize(raw);
-  transcript.textContent = raw;
 
-  if (/\b(detente|para|fin|alto|stop|detener)\b/.test(text)) {
+  // STOP
+  if (/\b(detente|detener|para|fin|alto|stop)\b/.test(text)) {
     speak("escucha detenida");
     stopListening();
     return;
   }
-  if (/\b(limpia|borra|quita|clear|limpiar)\b/.test(text)) {
+
+  // CLEAR
+  if (/\b(limpia|limpiar|borra|borrar|quita|quitar|clear)\b/.test(text)) {
     apiPost("/clear");
-    Object.values(cells).forEach((c) => c.classList.remove("hit"));
+    clearCellMarks();
+    showAction("Limpio", "—");
     speak("limpio");
     return;
   }
-  if (/\b(rejilla|cuadricula|grid|cuadrilla)\b/.test(text)) {
+
+  // GRID
+  if (/\b(rejilla|cuadricula|grid|cuadrilla)\b/.test(text) && !/\bboton(es)?\b/.test(text)) {
     apiPost("/grid/toggle");
+    showAction("Cuadrícula", "alternada");
     speak("cuadricula");
     return;
   }
-  const cell = parseCell(text);
-  if (cell) { highlightCell(cell); return; }
+
+  // SCROLL
+  if (/\b(scroll|desplaza|desplazar)\b/.test(text) ||
+      /\b(baja|bajar|sube|subir)\b.*pantalla/.test(text)) {
+    const dir = /\b(arriba|sube|subir|up)\b/.test(text) ? "up" : "down";
+    actScroll(dir);
+    return;
+  }
+
+  // DRAG — needs two cells and a drag verb
+  if (/\b(desliza|deslizar|arrastra|arrastrar|mueve|mover|drag)\b/.test(text)) {
+    const all = extractAllCells(text);
+    if (all.length >= 2) { actDrag(all[0], all[1]); return; }
+    if (all.length === 1) {
+      log(`Drag necesita dos celdas, solo encontré ${all[0]}`, "err");
+      speak("dime de qué celda a qué celda");
+      return;
+    }
+  }
+
+  // RIGHT CLICK
+  if (/\b(click derecho|derecho click|boton derecho|menu contextual)\b/.test(text)) {
+    const c = parseCellAndSub(text);
+    if (c) { actClick(c.cell, c.sub, "right", false); return; }
+  }
+
+  // DOUBLE CLICK
+  if (/\b(doble click|click doble|abre|abrir|dos veces)\b/.test(text)) {
+    const c = parseCellAndSub(text);
+    if (c) { actClick(c.cell, c.sub, "left", true); return; }
+  }
+
+  // SINGLE CLICK
+  if (/\b(haz click|hacer click|click|toca|tocar|tap|presiona|presionar|pulsa|pulsar|selecciona|seleccionar|escoge|elige)\b/.test(text)) {
+    const c = parseCellAndSub(text);
+    if (c) { actClick(c.cell, c.sub, "left", false); return; }
+  }
+
+  // HIGHLIGHT (default if a cell is present)
+  const c = parseCellAndSub(text);
+  if (c) { actHighlight(c.cell, c.sub); return; }
+
   log(`No entendí: "${raw}"`, "err");
 }
 
-// ── SpeechRecognition ─────────────────────────────────────────────────────
+// ── SpeechRecognition ────────────────────────────────────────────────────
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
 let listening = false;
@@ -690,9 +822,7 @@ function buildRecognition() {
       stopListening();
     }
   };
-  r.onend = () => {
-    if (listening) { try { r.start(); } catch (_) {} }
-  };
+  r.onend = () => { if (listening) { try { r.start(); } catch (_) {} } };
   return r;
 }
 
@@ -700,8 +830,7 @@ function startListening() {
   if (!recognition) recognition = buildRecognition();
   if (!recognition) return;
   listening = true;
-  try { recognition.start(); }
-  catch (e) { log(`start: ${e.message}`, "err"); }
+  try { recognition.start(); } catch (e) { log(`start: ${e.message}`, "err"); }
   statusEl.className = "status live";
   statusEl.innerHTML = "🎧 Escuchando — habla con calma, te entiendo.";
   btnMic.classList.add("active");
@@ -718,21 +847,17 @@ function stopListening() {
   micLabel.textContent = "Pulsa para empezar";
 }
 
-function toggleListening() {
-  if (listening) stopListening();
-  else startListening();
-}
+function toggleListening() { listening ? stopListening() : startListening(); }
 
-// ── Wire UI ───────────────────────────────────────────────────────────────
+// ── Wire UI ──────────────────────────────────────────────────────────────
 btnMic.addEventListener("click", toggleListening);
 btnClear.addEventListener("click", () => {
   apiPost("/clear");
-  Object.values(cells).forEach((c) => c.classList.remove("hit"));
-  transcript.textContent = "—";
+  clearCellMarks();
+  showAction("Limpio", "—");
 });
 btnGrid.addEventListener("click", () => apiPost("/grid/toggle"));
 
-// Keyboard: spacebar toggles listening (great for switch devices)
 document.addEventListener("keydown", (e) => {
   if (e.code === "Space" && !["INPUT","TEXTAREA"].includes(document.activeElement.tagName)) {
     e.preventDefault();
@@ -740,11 +865,11 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-// ── Boot ──────────────────────────────────────────────────────────────────
+// ── Boot ─────────────────────────────────────────────────────────────────
 log("MIJA cargada. Permite el micrófono cuando lo pida.");
 fetch(`${API}/status`).then((r) => r.json()).then((s) => {
   if (s.components?.overlay === "running") {
-    log("Overlay activo", "ok");
+    log("Overlay activo · v" + (s.version || "?"), "ok");
   } else {
     log("Overlay parado — corre MIJA_SEÑALADORA.bat", "err");
     statusEl.className = "status error";
