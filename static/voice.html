@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIJA Accesibilidad — IArtLabs</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg-2: #141414;
+    --fg: #ffffff;
+    --accent: #00ff66;
+    --accent-dim: #1a8c4a;
+    --danger: #ff3344;
+    --muted: #888;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 18px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  header {
+    text-align: center;
+    padding: 16px 0;
+    border-bottom: 2px solid var(--accent-dim);
+    margin-bottom: 24px;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 32px;
+    color: var(--accent);
+    letter-spacing: 2px;
+  }
+  header .subtitle {
+    color: var(--muted);
+    font-size: 16px;
+    margin-top: 8px;
+  }
+  .status {
+    text-align: center;
+    padding: 12px;
+    background: var(--bg-2);
+    border-radius: 8px;
+    margin-bottom: 24px;
+    font-size: 20px;
+    font-weight: bold;
+    transition: all 0.3s;
+  }
+  .status.idle   { color: var(--muted); }
+  .status.live   { color: var(--accent); animation: pulse 1.5s infinite; }
+  .status.error  { color: var(--danger); }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  .controls {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  button {
+    font-family: inherit;
+    font-size: 22px;
+    padding: 20px 36px;
+    min-height: 64px;
+    min-width: 200px;
+    border: 3px solid var(--accent);
+    background: var(--bg);
+    color: var(--accent);
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  button:hover, button:focus {
+    background: var(--accent);
+    color: var(--bg);
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+  button.active {
+    background: var(--accent);
+    color: var(--bg);
+  }
+  button.danger {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+  button.danger:hover {
+    background: var(--danger);
+    color: var(--bg);
+  }
+  .transcript {
+    background: var(--bg-2);
+    border: 2px solid var(--accent-dim);
+    padding: 24px;
+    border-radius: 12px;
+    min-height: 100px;
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 24px;
+    word-wrap: break-word;
+  }
+  .transcript .last {
+    color: var(--muted);
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  .transcript .text {
+    color: var(--accent);
+    font-weight: bold;
+  }
+  .grid-preview {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    gap: 2px;
+    background: var(--bg-2);
+    padding: 8px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    aspect-ratio: 16 / 9;
+  }
+  .cell {
+    background: var(--bg);
+    border: 1px solid var(--accent-dim);
+    color: var(--accent-dim);
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    transition: all 0.3s;
+  }
+  .cell.hit {
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: bold;
+    box-shadow: 0 0 16px var(--accent);
+    transform: scale(1.05);
+  }
+  .help {
+    background: var(--bg-2);
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .help h2 {
+    margin-top: 0;
+    color: var(--accent);
+    font-size: 20px;
+  }
+  .help ul { padding-left: 20px; }
+  .help li { margin-bottom: 6px; }
+  .help code {
+    background: var(--bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: var(--accent);
+    font-weight: bold;
+  }
+  .log {
+    margin-top: 16px;
+    padding: 12px;
+    background: var(--bg-2);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    max-height: 120px;
+    overflow-y: auto;
+  }
+  .log .entry { padding: 2px 0; }
+  .log .ok    { color: var(--accent); }
+  .log .err   { color: var(--danger); }
+  footer {
+    text-align: center;
+    margin-top: 24px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🐝 MIJA · ACCESIBILIDAD</h1>
+  <div class="subtitle">IArtLabs — apunta tu pantalla con la voz</div>
+</header>
+
+<div class="status idle" id="status" aria-live="polite">
+  Listo. Pulsa <strong>INICIAR</strong> para empezar a escuchar.
+</div>
+
+<div class="controls">
+  <button id="btnStart" aria-label="Iniciar escucha continua">🎤 INICIAR</button>
+  <button id="btnStop"  aria-label="Detener escucha" disabled>⏸ DETENER</button>
+  <button id="btnClear" aria-label="Limpiar overlay" class="danger">✖ LIMPIAR</button>
+</div>
+
+<div class="transcript" aria-live="polite">
+  <div class="last">Último comando reconocido:</div>
+  <div class="text" id="transcriptText">—</div>
+</div>
+
+<div class="grid-preview" id="gridPreview" aria-hidden="true"></div>
+
+<div class="help">
+  <h2>Comandos por voz</h2>
+  <ul>
+    <li><code>señala B3</code> — apunta a la celda B3</li>
+    <li><code>marca C7</code> · <code>punto H5</code> · <code>apunta D4</code> — sinónimos válidos</li>
+    <li><code>cuadrícula</code> · <code>rejilla</code> — mostrar/ocultar la cuadrícula</li>
+    <li><code>limpia</code> · <code>borra</code> · <code>quita</code> — quitar el señalador</li>
+    <li><code>detente</code> · <code>para</code> · <code>fin</code> — detener escucha</li>
+  </ul>
+  <p style="margin-top: 16px; color: var(--muted);">
+    Columnas: <strong>A → P</strong>  ·  Filas: <strong>1 → 9</strong>.
+    Puedes decir letra-número juntos ("B3") o por separado ("be tres").
+  </p>
+</div>
+
+<div class="log" id="log" aria-live="off"></div>
+
+<footer>
+  MIJA Focus Overlay · IArtLabs · accesibilidad libre
+</footer>
+
+<script>
+const API = window.location.origin;
+
+const $ = (id) => document.getElementById(id);
+const statusEl    = $("status");
+const transcript  = $("transcriptText");
+const logEl       = $("log");
+const btnStart    = $("btnStart");
+const btnStop     = $("btnStop");
+const btnClear    = $("btnClear");
+const gridPreview = $("gridPreview");
+
+// ── Build the 16×9 grid preview ────────────────────────────────────────────
+const COLS = "ABCDEFGHIJKLMNOP";
+const cells = {};
+for (let r = 1; r <= 9; r++) {
+  for (let c = 0; c < 16; c++) {
+    const name = COLS[c] + r;
+    const div = document.createElement("div");
+    div.className = "cell";
+    div.textContent = name;
+    div.id = "cell-" + name;
+    cells[name] = div;
+    gridPreview.appendChild(div);
+  }
+}
+
+// ── Logging ────────────────────────────────────────────────────────────────
+function log(msg, level = "") {
+  const entry = document.createElement("div");
+  entry.className = "entry " + level;
+  const ts = new Date().toLocaleTimeString();
+  entry.textContent = `[${ts}] ${msg}`;
+  logEl.prepend(entry);
+  while (logEl.children.length > 30) logEl.removeChild(logEl.lastChild);
+}
+
+// ── Speech synthesis (audio feedback) ──────────────────────────────────────
+function speak(text) {
+  if (!("speechSynthesis" in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "es-MX";
+  u.rate = 1.1;
+  u.volume = 0.7;
+  window.speechSynthesis.speak(u);
+}
+
+// ── Spanish number/letter parsing ──────────────────────────────────────────
+const SPELLED_LETTER = {
+  "a": "A",
+  "be": "B", "ve": "B", "b": "B",
+  "ce": "C", "c": "C", "se": "C",
+  "de": "D", "d": "D",
+  "e": "E",
+  "efe": "F", "f": "F",
+  "ge": "G", "g": "G",
+  "hache": "H", "h": "H", "ache": "H",
+  "i": "I", "y": "I",
+  "jota": "J", "j": "J",
+  "ka": "K", "ca": "K", "k": "K",
+  "ele": "L", "l": "L",
+  "eme": "M", "m": "M",
+  "ene": "N", "n": "N",
+  "o": "O",
+  "pe": "P", "p": "P",
+};
+const SPELLED_NUMBER = {
+  "uno": 1, "un": 1,
+  "dos": 2,
+  "tres": 3,
+  "cuatro": 4,
+  "cinco": 5,
+  "seis": 6,
+  "siete": 7,
+  "ocho": 8,
+  "nueve": 9,
+};
+
+function normalize(text) {
+  return text
+    .toLowerCase()
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")  // strip accents
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function parseCell(text) {
+  // Direct match like "b3" or "h5"
+  const direct = text.match(/\b([a-p])\s*([1-9])\b/i);
+  if (direct) return (direct[1] + direct[2]).toUpperCase();
+
+  // Spelled out: "be tres" / "be 3"
+  const tokens = normalize(text).split(" ");
+  for (let i = 0; i < tokens.length - 1; i++) {
+    const letter = SPELLED_LETTER[tokens[i]];
+    if (!letter) continue;
+    const next = tokens[i + 1];
+    const num = SPELLED_NUMBER[next] || parseInt(next, 10);
+    if (num >= 1 && num <= 9) return letter + num;
+  }
+  return null;
+}
+
+// ── Command dispatch ───────────────────────────────────────────────────────
+async function highlightCell(cell) {
+  // Update preview
+  Object.values(cells).forEach((c) => c.classList.remove("hit"));
+  if (cells[cell]) cells[cell].classList.add("hit");
+
+  transcript.textContent = `→ ${cell}`;
+  log(`POST /highlight/cell  ${cell}`);
+  speak(cell);
+
+  try {
+    const r = await fetch(`${API}/highlight/cell`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cell: cell,
+        color: "#00ff66",
+        label: `VOZ: ${cell}`,
+        duration: 8.0,
+        monitor: 0,            // 0 = auto-primary
+      }),
+    });
+    const data = await r.json();
+    log(`✓ ${cell} en monitor ${data.monitor}`, "ok");
+  } catch (e) {
+    log(`✗ ${e.message}`, "err");
+    speak("error de red");
+  }
+}
+
+async function apiPost(path) {
+  log(`POST ${path}`);
+  try {
+    await fetch(`${API}${path}`, { method: "POST" });
+  } catch (e) {
+    log(`✗ ${e.message}`, "err");
+  }
+}
+
+function dispatchPhrase(raw) {
+  const text = normalize(raw);
+  transcript.textContent = raw;
+
+  // Stop commands
+  if (/\b(detente|para|fin|alto|stop)\b/.test(text)) {
+    speak("escucha detenida");
+    stopListening();
+    return;
+  }
+
+  // Clear
+  if (/\b(limpia|borra|quita|clear|limpiar)\b/.test(text)) {
+    apiPost("/clear");
+    Object.values(cells).forEach((c) => c.classList.remove("hit"));
+    speak("limpio");
+    return;
+  }
+
+  // Grid toggle
+  if (/\b(rejilla|cuadricula|grid|cuadrilla)\b/.test(text)) {
+    apiPost("/grid/toggle");
+    speak("cuadricula");
+    return;
+  }
+
+  // Cell highlight
+  const cell = parseCell(text);
+  if (cell) {
+    highlightCell(cell);
+    return;
+  }
+
+  log(`? no entendí: "${raw}"`, "err");
+}
+
+// ── SpeechRecognition setup ────────────────────────────────────────────────
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let listening = false;
+
+function buildRecognition() {
+  if (!SR) {
+    statusEl.className = "status error";
+    statusEl.innerHTML = "⚠ Tu navegador no soporta reconocimiento de voz. Usa Edge o Chrome.";
+    btnStart.disabled = true;
+    return null;
+  }
+  const r = new SR();
+  r.lang = "es-MX";
+  r.continuous = true;
+  r.interimResults = false;
+  r.maxAlternatives = 1;
+
+  r.onresult = (ev) => {
+    for (let i = ev.resultIndex; i < ev.results.length; i++) {
+      if (ev.results[i].isFinal) {
+        const phrase = ev.results[i][0].transcript.trim();
+        log(`🎤 "${phrase}"`);
+        dispatchPhrase(phrase);
+      }
+    }
+  };
+  r.onerror = (ev) => {
+    log(`✗ STT error: ${ev.error}`, "err");
+    if (ev.error === "not-allowed" || ev.error === "service-not-allowed") {
+      statusEl.className = "status error";
+      statusEl.innerHTML = "⚠ Permiso de micrófono denegado.";
+      stopListening();
+    }
+  };
+  r.onend = () => {
+    // Browser sometimes auto-stops continuous mode — restart if still wanted.
+    if (listening) {
+      try { r.start(); } catch (_) {}
+    }
+  };
+  return r;
+}
+
+function startListening() {
+  if (!recognition) recognition = buildRecognition();
+  if (!recognition) return;
+  listening = true;
+  try {
+    recognition.start();
+  } catch (e) {
+    log(`✗ start: ${e.message}`, "err");
+  }
+  statusEl.className = "status live";
+  statusEl.innerHTML = "🎤 ESCUCHANDO… habla cuando quieras.";
+  btnStart.disabled = true;
+  btnStart.classList.add("active");
+  btnStop.disabled = false;
+  speak("escuchando");
+}
+
+function stopListening() {
+  listening = false;
+  if (recognition) {
+    try { recognition.stop(); } catch (_) {}
+  }
+  statusEl.className = "status idle";
+  statusEl.innerHTML = "Detenido. Pulsa <strong>INICIAR</strong> para volver a escuchar.";
+  btnStart.disabled = false;
+  btnStart.classList.remove("active");
+  btnStop.disabled = true;
+}
+
+// ── Button wiring ──────────────────────────────────────────────────────────
+btnStart.addEventListener("click", startListening);
+btnStop.addEventListener("click",  stopListening);
+btnClear.addEventListener("click", () => {
+  apiPost("/clear");
+  Object.values(cells).forEach((c) => c.classList.remove("hit"));
+  transcript.textContent = "—";
+});
+
+// ── Boot ───────────────────────────────────────────────────────────────────
+log("MIJA accesibilidad cargada. Edge/Chrome → permitir micrófono.");
+fetch(`${API}/status`).then((r) => r.json()).then((s) => {
+  if (s.components?.overlay === "running") {
+    log("✓ overlay activo", "ok");
+  } else {
+    log("⚠ overlay parado — corre MIJA_SEÑALADORA.bat", "err");
+  }
+});
+</script>
+</body>
+</html>
