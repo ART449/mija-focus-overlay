@@ -10,3 +10,17 @@ selection.json
 screen_capture.png
 templates/*.png
 !templates/.gitkeep
+
+# evidencia (videos / capturas grandes — viven en disco, no en git)
+_evidencia/*.mp4
+_evidencia/*.mkv
+_evidencia/*.webm
+_evidencia/*.png
+_evidencia/*.jpg
+
+# agent inbox (JSONL diarios efímeros)
+agent_inbox/*.jsonl
+
+# venv / build artifacts
+.venv*/
+*.egg-info/
