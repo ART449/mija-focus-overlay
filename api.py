@@ -17,11 +17,15 @@ Routes:
   POST /drag                  — REAL OS drag between two cells
   POST /scroll                — REAL OS scroll wheel at a cell
 
+  POST /agent/inbox           — relay voz user → AI agent (file append)
+  GET  /agent/inbox/recent    — last N voice messages (for AI to read)
+
   GET  /voice                 — accessibility UI (browser-based STT)
   GET  /templates             — list image templates
 """
 
 import ctypes
+import datetime
 import json
 import os
 import subprocess
@@ -50,6 +54,8 @@ app.add_middleware(
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
+INBOX_DIR  = os.path.join(BASE_DIR, "agent_inbox")
+os.makedirs(INBOX_DIR, exist_ok=True)
 
 
 # ── Models ────────────────────────────────────────────────────────────────
@@ -95,6 +101,13 @@ class ScrollRequest(BaseModel):
     direction: str = "up"      # up | down
     clicks: int = 3
     monitor: int = 0
+
+
+class InboxMessage(BaseModel):
+    transcript: str                # what the user said
+    handled_locally: bool = False  # did the regex parser already act?
+    parsed_action: dict | None = None   # what the JS parser inferred (if any)
+    context: dict | None = None    # window-focused app, time, etc.
 
 
 # ── Monitor helpers ───────────────────────────────────────────────────────
@@ -343,6 +356,46 @@ def post_scroll(req: ScrollRequest):
         "cell": req.cell, "direction": req.direction,
         "clicks": req.clicks, "monitor": monitor,
     }
+
+
+# ── Agent inbox (voz → AI) ────────────────────────────────────────────────
+# Cuando el usuario habla por MIJA Voz, además de que el parser local
+# intente actuar, se manda copia del transcript a este buzón. Un agente
+# (Memo / Claude / Ollama / etc.) puede leer estos mensajes y reaccionar
+# con más contexto del que tiene un regex.
+def _inbox_path() -> str:
+    today = datetime.datetime.now().strftime("%Y-%m-%d")
+    return os.path.join(INBOX_DIR, f"{today}.jsonl")
+
+
+@app.post("/agent/inbox")
+def post_inbox(msg: InboxMessage):
+    entry = {
+        "ts": datetime.datetime.now().isoformat(),
+        "transcript": msg.transcript,
+        "handled_locally": msg.handled_locally,
+        "parsed_action": msg.parsed_action,
+        "context": msg.context or {},
+    }
+    with open(_inbox_path(), "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    return {"status": "logged", "path": _inbox_path()}
+
+
+@app.get("/agent/inbox/recent")
+def get_inbox_recent(limit: int = 20):
+    path = _inbox_path()
+    if not os.path.exists(path):
+        return {"messages": []}
+    with open(path, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+    out = []
+    for line in lines[-limit:]:
+        try:
+            out.append(json.loads(line))
+        except Exception:
+            pass
+    return {"messages": out, "path": path}
 
 
 # ── Static UI ─────────────────────────────────────────────────────────────

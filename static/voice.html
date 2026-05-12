@@ -683,38 +683,85 @@ async function actScroll(direction, cell = "H5") {
   setStatus(listening ? "Escuchando" : "Listo", listening ? "live" : "");
 }
 
-function dispatchPhrase(raw) {
-  const text = normalize(raw);
+// Envía TODA frase al inbox del agente (en paralelo al parser local).
+// El agente (Memo/Claude/Ollama) puede leer el inbox y reaccionar con más
+// contexto que un regex.
+async function inboxRelay(raw, parsedAction, handledLocally) {
+  try {
+    await fetch(`${API}/agent/inbox`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        transcript: raw,
+        handled_locally: handledLocally,
+        parsed_action: parsedAction,
+        context: { focused_app: document.title, ts: new Date().toISOString() },
+      }),
+    });
+  } catch (e) { /* silent — no romper UX si el inbox falla */ }
+}
 
-  if (/\b(detente|detener|para|fin|alto|stop)\b/.test(text)) { speak("escucha detenida"); stopListening(); return; }
-  if (/\b(limpia|limpiar|borra|borrar|quita|quitar|clear)\b/.test(text)) {
-    apiPost("/clear"); clearCellMarks(); setLastAction("Limpio", "—"); speak("limpio"); return;
-  }
-  if (/\b(rejilla|cuadricula|grid|cuadrilla)\b/.test(text) && !/\bboton(es)?\b/.test(text)) {
-    apiPost("/grid/toggle"); setLastAction("Cuadrícula", "alternada"); speak("cuadricula"); return;
-  }
+function classifyPhrase(text) {
+  // Local regex parser — produce un action plan o null si no entiende
+  if (/\b(detente|detener|para|fin|alto|stop)\b/.test(text)) return { type: "stop" };
+  if (/\b(limpia|limpiar|borra|borrar|quita|quitar|clear)\b/.test(text)) return { type: "clear" };
+  if (/\b(rejilla|cuadricula|grid|cuadrilla)\b/.test(text) && !/\bboton(es)?\b/.test(text)) return { type: "grid_toggle" };
   if (/\b(scroll|desplaza|desplazar)\b/.test(text) || /\b(baja|bajar|sube|subir)\b.*pantalla/.test(text)) {
-    const dir = /\b(arriba|sube|subir|up)\b/.test(text) ? "up" : "down";
-    actScroll(dir); return;
+    return { type: "scroll", direction: /\b(arriba|sube|subir|up)\b/.test(text) ? "up" : "down" };
   }
   if (/\b(desliza|deslizar|arrastra|arrastrar|mueve|mover|drag)\b/.test(text)) {
     const all = extractAllCells(text);
-    if (all.length >= 2) { actDrag(all[0], all[1]); return; }
-    if (all.length === 1) { log(`Drag necesita 2 celdas, solo ${all[0]}`, "err"); speak("dime de qué celda a qué celda"); return; }
+    if (all.length >= 2) return { type: "drag", from: all[0], to: all[1] };
+    return { type: "drag_incomplete", cells: all };
   }
   if (/\b(click derecho|derecho click|boton derecho|menu contextual)\b/.test(text)) {
-    const c = parseCellAndSub(text); if (c) { actClick(c.cell, c.sub, "right", false); return; }
+    const c = parseCellAndSub(text);
+    if (c) return { type: "click", cell: c.cell, sub: c.sub, button: "right", double: false };
   }
   if (/\b(doble click|click doble|abre|abrir|dos veces)\b/.test(text)) {
-    const c = parseCellAndSub(text); if (c) { actClick(c.cell, c.sub, "left", true); return; }
+    const c = parseCellAndSub(text);
+    if (c) return { type: "click", cell: c.cell, sub: c.sub, button: "left", double: true };
   }
   if (/\b(haz click|hacer click|click|toca|tocar|tap|presiona|presionar|pulsa|pulsar|selecciona|seleccionar|escoge|elige)\b/.test(text)) {
-    const c = parseCellAndSub(text); if (c) { actClick(c.cell, c.sub, "left", false); return; }
+    const c = parseCellAndSub(text);
+    if (c) return { type: "click", cell: c.cell, sub: c.sub, button: "left", double: false };
   }
   const c = parseCellAndSub(text);
-  if (c) { actHighlight(c.cell, c.sub); return; }
-  log(`No entendí: "${raw}"`, "err");
-  setLastAction("?", `"${raw}"`);
+  if (c) return { type: "highlight", cell: c.cell, sub: c.sub };
+  return null;
+}
+
+function executeAction(act) {
+  if (!act) return false;
+  switch (act.type) {
+    case "stop":         speak("escucha detenida"); stopListening(); return true;
+    case "clear":        apiPost("/clear"); clearCellMarks(); setLastAction("Limpio", "—"); speak("limpio"); return true;
+    case "grid_toggle":  apiPost("/grid/toggle"); setLastAction("Cuadrícula", "alternada"); speak("cuadricula"); return true;
+    case "scroll":       actScroll(act.direction); return true;
+    case "drag":         actDrag(act.from, act.to); return true;
+    case "drag_incomplete":
+      log(`Drag necesita 2 celdas, solo ${(act.cells||[]).join(",") || "ninguna"}`, "err");
+      speak("dime de qué celda a qué celda");
+      return false;
+    case "click":        actClick(act.cell, act.sub, act.button, act.double); return true;
+    case "highlight":    actHighlight(act.cell, act.sub); return true;
+  }
+  return false;
+}
+
+function dispatchPhrase(raw) {
+  const text = normalize(raw);
+  const plan = classifyPhrase(text);
+  const handled = executeAction(plan);
+
+  // SIEMPRE relay al agente — entienda o no el parser local.
+  // Asi tu asistente real ve todo y puede actuar con más contexto.
+  inboxRelay(raw, plan, handled);
+
+  if (!handled) {
+    log(`No entendí: "${raw}" — enviado al agente`, "err");
+    setLastAction("?", `"${raw}"`);
+  }
 }
 
 // ── SpeechRecognition ────────────────────────────────────────────────────
