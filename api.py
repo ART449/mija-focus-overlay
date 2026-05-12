@@ -26,6 +26,13 @@ class HighlightRequest(BaseModel):
     label: str = "WEB_ACTION"
     duration: float = 10.0
 
+class CellRequest(BaseModel):
+    cell: str          # e.g. "B3", "H5"
+    color: str = "green"
+    label: str = ""    # vacío = usa el nombre de la celda
+    duration: float = 6.0
+    monitor: int = 1
+
 @app.get("/status")
 def get_status():
     overlay_active = os.path.exists(os.path.join(BASE_DIR, "overlay.pid"))
@@ -50,6 +57,36 @@ def post_highlight(req: HighlightRequest):
         return {"status": "success", "message": f"Highlight sent to ({req.x}, {req.y})"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/highlight/cell")
+def post_highlight_cell(req: CellRequest):
+    """Highlight a grid cell by name — agents use this. e.g. POST /highlight/cell  {'cell':'B3'}"""
+    try:
+        label = req.label or req.cell
+        cmd = [
+            "python", "main.py", "cell",
+            req.cell, req.color, label,
+            str(req.duration), str(req.monitor),
+        ]
+        subprocess.Popen(cmd, cwd=BASE_DIR)
+        return {"status": "success", "message": f"Highlighting cell {req.cell}"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/grid/on")
+def grid_on():
+    subprocess.Popen(["python", "main.py", "grid_on"], cwd=BASE_DIR)
+    return {"status": "success", "grid": "on"}
+
+@app.post("/grid/off")
+def grid_off():
+    subprocess.Popen(["python", "main.py", "grid_off"], cwd=BASE_DIR)
+    return {"status": "success", "grid": "off"}
+
+@app.post("/grid/toggle")
+def grid_toggle():
+    subprocess.Popen(["python", "main.py", "grid_toggle"], cwd=BASE_DIR)
+    return {"status": "success", "grid": "toggled"}
 
 @app.post("/clear")
 def post_clear():

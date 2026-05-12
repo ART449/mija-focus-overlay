@@ -17,7 +17,11 @@ def main():
     if len(sys.argv) < 2:
         print("M.I.J.A Focus Controller")
         print("Usage:")
-        print("  python main.py highlight <x> <y> <w> <h> [color] [label]")
+        print("  python main.py highlight <x> <y> <w> <h> [color] [label] [duration]")
+        print("  python main.py cell <CELL> [color] [label] [duration] [monitor]  e.g. cell B3 green")
+        print("  python main.py grid_on       -- mostrar cuadrícula A-P / 1-9")
+        print("  python main.py grid_off      -- ocultar cuadrícula")
+        print("  python main.py grid_toggle   -- alternar cuadrícula")
         print("  python main.py clear")
         print("  python main.py capture")
         print("  python main.py test")
@@ -41,6 +45,40 @@ def main():
         }
         send_command(data)
         print(f"SENT: Highlight at ({data['x']}, {data['y']}) Color: {data['color']}")
+
+    # ── Grid commands ──────────────────────────────────────────────────────────
+    elif cmd == "grid_on":
+        send_command({"action": "grid_on"})
+        print("SENT: Grid ON  (cols A–P, rows 1–9)")
+
+    elif cmd == "grid_off":
+        send_command({"action": "grid_off"})
+        print("SENT: Grid OFF")
+
+    elif cmd == "grid_toggle":
+        send_command({"action": "grid_toggle"})
+        print("SENT: Grid TOGGLE")
+
+    # ── Highlight by cell name ─────────────────────────────────────────────────
+    elif cmd == "cell":
+        if len(sys.argv) < 3:
+            print("Usage: python main.py cell <CELL> [color] [label] [duration] [monitor]")
+            print("  e.g. python main.py cell B3 green")
+            return
+        cell     = sys.argv[2].upper()
+        color    = sys.argv[3] if len(sys.argv) > 3 else "green"
+        label    = sys.argv[4] if len(sys.argv) > 4 else cell
+        duration = float(sys.argv[5]) if len(sys.argv) > 5 else 6.0
+        monitor  = int(sys.argv[6]) if len(sys.argv) > 6 else 1
+        send_command({
+            "action": "highlight_cell",
+            "cell": cell,
+            "color": color,
+            "label": label,
+            "duration": duration,
+            "monitor": monitor,
+        })
+        print(f"SENT: Highlight cell {cell}  color={color}  label={label}")
 
     elif cmd == "clear":
         send_command({"action": "clear"})
