@@ -4,10 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MIJA · Asistente visual por voz — IArtLabs</title>
-<meta name="description" content="MIJA es una asistente visual que apunta y hace click por ti en la pantalla. Diseñada para personas con discapacidad motriz y para asistentes virtuales que te ayudan a encontrar las cosas.">
 <style>
   :root {
-    --bg:           #fffbf2;
     --bg-gradient:  linear-gradient(180deg, #fff8e7 0%, #fffbf2 100%);
     --surface:      #ffffff;
     --surface-alt:  #fef9ec;
@@ -25,11 +23,9 @@
     --text-soft:    #4b5563;
     --text-muted:   #9ca3af;
     --border:       #f3e8c8;
-    --shadow-sm:    0 1px 2px rgba(217,119,6,0.05);
-    --shadow:       0 4px 16px rgba(217,119,6,0.08);
-    --shadow-lg:    0 12px 32px rgba(217,119,6,0.12);
-    --radius:       16px;
-    --radius-sm:    10px;
+    --shadow:       0 8px 32px rgba(217,119,6,0.10);
+    --radius:       18px;
+    --radius-sm:    12px;
   }
   * { box-sizing: border-box; }
   html, body {
@@ -37,99 +33,138 @@
     background: var(--bg-gradient);
     color: var(--text);
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-    font-size: 18px;
-    line-height: 1.6;
-    min-height: 100vh;
+    font-size: 17px;
+    line-height: 1.5;
+    height: 100vh;
+    overflow: hidden;        /* nada de scroll */
   }
-  .wrap {
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 32px 24px 64px;
-  }
+  body { display: flex; align-items: center; justify-content: center; padding: 16px; }
 
-  /* ── Header / Hero ──────────────────────────────────────────────────── */
-  header.hero { text-align: center; padding: 32px 0 24px; }
-  .brand {
-    display: inline-flex; align-items: center; gap: 12px;
-    background: var(--surface);
-    padding: 10px 20px;
-    border-radius: 999px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border);
-    font-size: 14px;
-    color: var(--text-soft);
-    margin-bottom: 24px;
-  }
-  .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
-  h1.title { margin: 0 0 12px; font-size: 44px; font-weight: 800; letter-spacing: -1px; }
-  h1.title .bee { display: inline-block; transform: translateY(-4px); }
-  .tagline {
-    font-size: 22px;
-    color: var(--text-soft);
-    max-width: 700px;
-    margin: 0 auto;
-    font-weight: 400;
-  }
-
-  /* ── Audience cards ─────────────────────────────────────────────────── */
-  .audience {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin: 32px 0 40px;
-  }
-  @media (max-width: 720px) {
-    .audience { grid-template-columns: 1fr; }
-    h1.title { font-size: 32px; }
-    .tagline { font-size: 18px; }
-  }
-  .audience .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .audience .card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-  .audience .icon { font-size: 36px; margin-bottom: 12px; }
-  .audience h3 { margin: 0 0 8px; font-size: 20px; font-weight: 700; }
-  .audience p { margin: 0; color: var(--text-soft); font-size: 16px; line-height: 1.5; }
-
-  /* ── Panels ─────────────────────────────────────────────────────────── */
-  .panel {
+  /* ── App container ───────────────────────────────────────────────────── */
+  .app {
+    width: 100%;
+    max-width: 760px;
+    height: 100%;
+    max-height: 760px;
     background: var(--surface);
     border-radius: var(--radius);
-    padding: 32px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
-    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
-  .status {
-    text-align: center;
-    padding: 14px 20px;
-    border-radius: var(--radius-sm);
-    margin-bottom: 24px;
-    font-size: 17px;
-    font-weight: 500;
-    transition: all 0.3s;
-    background: var(--surface-alt);
-    color: var(--text-soft);
-  }
-  .status.live    { background: var(--accent-soft); color: var(--accent); animation: breathe 2.5s ease-in-out infinite; }
-  .status.action  { background: var(--info-soft);   color: var(--info); }
-  .status.error   { background: var(--danger-soft); color: var(--danger); }
-  @keyframes breathe { 0%, 100% { opacity: 1; } 50% { opacity: 0.75; } }
 
-  /* ── Mic button ─────────────────────────────────────────────────────── */
-  .mic-zone { text-align: center; padding: 24px 0; }
+  /* ── Topbar (slim) ───────────────────────────────────────────────────── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-alt);
+  }
+  .brand {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: var(--text);
+  }
+  .brand .sub {
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 2px;
+  }
+  .brand .bee { display: inline-block; transform: translateY(-1px); }
+  .spacer { flex: 1; }
+  .status-pill {
+    background: var(--surface);
+    color: var(--text-soft);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+    transition: all 0.3s;
+  }
+  .status-pill.live   { background: var(--accent-soft);  color: var(--accent); animation: breathe 2.5s ease-in-out infinite; }
+  .status-pill.action { background: var(--info-soft);    color: var(--info); }
+  .status-pill.error  { background: var(--danger-soft);  color: var(--danger); }
+  @keyframes breathe { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+  .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-soft);
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-btn:hover { background: var(--primary-bg); color: var(--primary-hov); border-color: var(--primary-soft); }
+
+  /* ── Main centered area ──────────────────────────────────────────────── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 24px;
+    text-align: center;
+    gap: 20px;
+    min-height: 0;       /* lets flex children shrink */
+  }
+
+  .last-action {
+    width: 100%;
+    max-width: 460px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 18px;
+  }
+  .la-label {
+    color: var(--text-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 4px;
+  }
+  .la-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary);
+    min-height: 28px;
+    line-height: 1.2;
+  }
+  .la-text .verb {
+    color: var(--text-soft);
+    font-size: 15px;
+    font-weight: 500;
+    margin-right: 8px;
+  }
+
+  /* ── Mic ─────────────────────────────────────────────────────────────── */
+  .mic-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
   .mic-btn {
-    width: 140px; height: 140px;
+    width: 130px; height: 130px;
     border-radius: 50%;
     border: none;
     background: var(--primary);
     color: white;
-    font-size: 48px;
+    font-size: 46px;
     cursor: pointer;
     box-shadow: 0 8px 24px rgba(217,119,6,0.35);
     transition: all 0.25s;
@@ -141,102 +176,77 @@
   .mic-btn:focus-visible { outline: 4px solid var(--primary-soft); outline-offset: 4px; }
   .mic-btn.active {
     background: var(--accent);
-    box-shadow: 0 0 0 12px rgba(5,150,105,0.15), 0 0 0 24px rgba(5,150,105,0.08);
+    box-shadow: 0 0 0 10px rgba(5,150,105,0.15), 0 0 0 22px rgba(5,150,105,0.08);
     animation: pulse 2s infinite;
   }
   @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 0 12px rgba(5,150,105,0.15), 0 0 0 24px rgba(5,150,105,0.08); }
-    50%      { box-shadow: 0 0 0 18px rgba(5,150,105,0.20), 0 0 0 36px rgba(5,150,105,0.10); }
+    0%, 100% { box-shadow: 0 0 0 10px rgba(5,150,105,0.15), 0 0 0 22px rgba(5,150,105,0.08); }
+    50%      { box-shadow: 0 0 0 16px rgba(5,150,105,0.20), 0 0 0 32px rgba(5,150,105,0.10); }
   }
   .mic-btn:disabled { background: var(--text-muted); cursor: not-allowed; box-shadow: none; transform: none; }
-  .mic-label { margin-top: 16px; font-size: 18px; font-weight: 600; color: var(--text); }
-  .mic-hint  { margin-top: 4px;  color: var(--text-muted); font-size: 14px; }
-
-  .secondary-row {
-    display: flex; gap: 12px; justify-content: center;
-    margin-top: 24px; flex-wrap: wrap;
-  }
-  .btn {
-    font-family: inherit;
+  .mic-label {
     font-size: 15px;
-    padding: 12px 22px;
-    min-height: 48px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .mic-hint { color: var(--text-muted); font-size: 13px; margin-top: -4px; }
+
+  /* ── Action chips ────────────────────────────────────────────────────── */
+  .chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .chip {
+    font-family: inherit;
+    font-size: 14px;
+    padding: 10px 18px;
+    min-height: 42px;
     border: 1.5px solid var(--border);
     background: var(--surface);
     color: var(--text);
-    border-radius: var(--radius-sm);
+    border-radius: 999px;
     cursor: pointer;
     font-weight: 600;
     transition: all 0.2s;
   }
-  .btn:hover { border-color: var(--primary); color: var(--primary); }
-  .btn:focus-visible { outline: 3px solid var(--primary-soft); outline-offset: 2px; }
-  .btn.danger { color: var(--danger); }
-  .btn.danger:hover { border-color: var(--danger); background: var(--danger-soft); }
+  .chip:hover { border-color: var(--primary); color: var(--primary); }
+  .chip:focus-visible { outline: 3px solid var(--primary-soft); outline-offset: 2px; }
+  .chip.danger { color: var(--danger); }
+  .chip.danger:hover { border-color: var(--danger); background: var(--danger-soft); }
 
-  /* ── Last action card ───────────────────────────────────────────────── */
-  .last-action {
+  /* ── Grid preview footer ─────────────────────────────────────────────── */
+  .grid-zone {
+    padding: 14px 20px 18px;
     background: var(--surface-alt);
-    border-radius: var(--radius-sm);
-    padding: 20px 24px;
-    text-align: center;
-    margin-bottom: 16px;
-    border: 1px solid var(--border);
-  }
-  .la-label {
-    color: var(--text-muted);
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
-  }
-  .la-action {
-    font-size: 16px;
-    color: var(--text-soft);
-    margin-bottom: 4px;
-  }
-  .la-target {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--primary);
-  }
-  .la-target .verb {
-    color: var(--text-muted);
-    font-size: 18px;
-    font-weight: 500;
-    margin-right: 8px;
-  }
-
-  /* ── Grid preview ───────────────────────────────────────────────────── */
-  .grid-wrap {
-    background: var(--surface-alt);
-    border-radius: var(--radius-sm);
-    padding: 14px;
-    border: 1px solid var(--border);
+    border-top: 1px solid var(--border);
   }
   .grid-title {
     color: var(--text-muted);
-    font-size: 13px;
+    font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
+    letter-spacing: 1.2px;
     text-align: center;
+    margin-bottom: 6px;
   }
   .grid-preview {
     display: grid;
     grid-template-columns: repeat(16, 1fr);
-    gap: 3px;
+    gap: 2px;
     aspect-ratio: 16 / 9;
+    max-height: 130px;
+    margin: 0 auto;
   }
   .cell {
     background: var(--surface);
     border: 1px solid var(--border);
     color: var(--text-muted);
-    font-size: 9px;
+    font-size: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 3px;
+    border-radius: 2px;
     transition: all 0.3s;
     font-weight: 500;
   }
@@ -245,100 +255,134 @@
     color: white;
     border-color: var(--primary);
     font-weight: 700;
-    box-shadow: 0 0 0 3px var(--primary-soft);
-    transform: scale(1.1);
+    box-shadow: 0 0 0 2px var(--primary-soft);
+    transform: scale(1.15);
+    z-index: 1;
   }
   .cell.click-flash {
     background: var(--accent);
     color: white;
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
     animation: click-bounce 0.6s ease-out;
   }
   @keyframes click-bounce {
     0%   { transform: scale(1); }
-    50%  { transform: scale(1.3); }
-    100% { transform: scale(1.1); }
+    50%  { transform: scale(1.4); }
+    100% { transform: scale(1.15); }
   }
 
-  /* ── Sub-grid legend ────────────────────────────────────────────────── */
+  /* ── Help modal ──────────────────────────────────────────────────────── */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(31,41,55,0.45);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 16px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    width: 100%;
+    max-width: 680px;
+    max-height: 90vh;
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-head {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .modal-head h2 { margin: 0; font-size: 22px; font-weight: 800; }
+  .modal-body {
+    padding: 18px 24px 24px;
+    overflow-y: auto;
+  }
+  .audience {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 600px) { .audience { grid-template-columns: 1fr; } }
+  .audience .card {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+  }
+  .audience .icon { font-size: 22px; }
+  .audience h3 { margin: 4px 0 4px; font-size: 15px; font-weight: 700; }
+  .audience p  { margin: 0; color: var(--text-soft); font-size: 13px; line-height: 1.45; }
+
+  .cmd-section { margin-bottom: 14px; }
+  .cmd-section:last-child { margin-bottom: 0; }
+  .cmd-section .label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  .commands-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 8px;
+  }
+  .cmd {
+    background: var(--surface-alt);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+  }
+  .cmd code {
+    background: var(--primary-bg);
+    color: var(--primary-hov);
+    padding: 3px 9px;
+    border-radius: 5px;
+    font-family: 'SF Mono', Consolas, monospace;
+    font-weight: 700;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .cmd-desc { color: var(--text-soft); }
   .subgrid-legend {
-    margin-top: 12px;
+    margin-top: 14px;
+    padding: 12px;
+    background: var(--primary-bg);
+    border-radius: var(--radius-sm);
     text-align: center;
   }
-  .subgrid-legend .title {
-    font-size: 13px; color: var(--text-muted); margin-bottom: 6px;
-    text-transform: uppercase; letter-spacing: 1px;
-  }
+  .subgrid-legend .title { font-size: 12px; color: var(--primary-hov); font-weight: 700; margin-bottom: 6px; }
   .subgrid-mini {
     display: inline-grid;
-    grid-template-columns: repeat(4, 32px);
-    grid-template-rows: repeat(3, 32px);
-    gap: 4px;
-    background: var(--primary-bg);
-    padding: 6px;
-    border-radius: 8px;
+    grid-template-columns: repeat(4, 28px);
+    grid-template-rows: repeat(3, 28px);
+    gap: 3px;
   }
   .subgrid-mini .sub {
     background: var(--surface);
     border: 1px solid var(--primary-soft);
     border-radius: 4px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 600;
+    font-size: 12px; font-weight: 700;
     color: var(--primary-hov);
   }
 
-  /* ── Commands help ──────────────────────────────────────────────────── */
-  .cmd-section { margin-bottom: 20px; }
-  .cmd-section:last-child { margin-bottom: 0; }
-  .cmd-section .label {
-    font-size: 13px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-    font-weight: 600;
-  }
-  .commands-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 10px;
-  }
-  .cmd {
-    background: var(--surface-alt);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    border: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-  }
-  .cmd code {
-    background: var(--primary-bg);
-    color: var(--primary-hov);
-    padding: 3px 10px;
-    border-radius: 6px;
-    font-family: 'SF Mono', Consolas, monospace;
-    font-weight: 700;
-    font-size: 13px;
-    white-space: nowrap;
-  }
-  .cmd-desc { color: var(--text-soft); }
-  h2 { font-size: 22px; margin: 0 0 12px; font-weight: 700; }
-  h2 .pill {
-    display: inline-block;
-    background: var(--primary-bg);
-    color: var(--primary-hov);
-    font-size: 12px;
-    padding: 3px 10px;
-    border-radius: 999px;
-    margin-left: 8px;
-    vertical-align: middle;
-    font-weight: 600;
-  }
-
-  /* ── Log ─────────────────────────────────────────────────────────────── */
   details.log-wrap {
     margin-top: 16px;
     background: var(--surface-alt);
@@ -347,182 +391,158 @@
   }
   details.log-wrap summary {
     cursor: pointer;
-    padding: 12px 18px;
+    padding: 10px 14px;
     color: var(--text-soft);
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 600;
   }
-  details.log-wrap summary:hover { color: var(--primary); }
   .log {
-    padding: 0 18px 14px;
-    font-size: 12px;
+    padding: 0 14px 12px;
+    font-size: 11px;
     color: var(--text-soft);
-    max-height: 180px;
+    max-height: 140px;
     overflow-y: auto;
     font-family: 'SF Mono', Consolas, monospace;
   }
-  .log .entry { padding: 2px 0; }
+  .log .entry { padding: 1px 0; }
   .log .ok  { color: var(--accent); }
   .log .err { color: var(--danger); }
   .log .act { color: var(--info); font-weight: 600; }
-
-  footer {
-    text-align: center;
-    margin-top: 32px;
-    color: var(--text-muted);
-    font-size: 14px;
-  }
-  footer .signature { color: var(--primary); font-weight: 600; }
 </style>
 </head>
 <body>
 
-<div class="wrap">
+<div class="app">
 
-  <header class="hero">
-    <div class="brand">
-      <span class="dot"></span>
-      <span>IArtLabs · accesibilidad libre</span>
-    </div>
-    <h1 class="title"><span class="bee">🐝</span> MIJA</h1>
-    <p class="tagline">
-      Tu pantalla, a tu voz.<br>
-      Apunta, haz click y arrastra — todo sin tocar nada.
-    </p>
-  </header>
+  <div class="topbar">
+    <div class="brand"><span class="bee">🐝</span> MIJA<span class="sub"> · asistente por voz</span></div>
+    <div class="spacer"></div>
+    <div class="status-pill" id="status" aria-live="polite">Listo</div>
+    <button id="btnHelp" class="icon-btn" title="Ver comandos y ayuda" aria-label="Ayuda">?</button>
+  </div>
 
-  <section class="audience" aria-label="Para quién es MIJA">
-    <div class="card">
-      <div class="icon" aria-hidden="true">🤖</div>
-      <h3>Para tu asistente virtual</h3>
-      <p>
-        En vez de explicarte con palabras dónde está algo, tu asistente
-        te lo <strong>señala</strong> en la pantalla. Y si lo autorizas,
-        también puede <strong>hacer click por ti</strong>.
-      </p>
-    </div>
-    <div class="card">
-      <div class="icon" aria-hidden="true">♿</div>
-      <h3>Para personas con discapacidad motriz</h3>
-      <p>
-        Habla y la pantalla responde. Hacer click, doble click, arrastrar,
-        hacer scroll — <strong>todo con tu voz</strong>. Sin mouse, sin teclado,
-        sin esfuerzo físico.
-      </p>
-    </div>
-  </section>
+  <div class="main">
 
-  <section class="panel">
-
-    <div class="status" id="status" aria-live="polite">
-      Listo para empezar. Pulsa el micrófono.
+    <div class="last-action" aria-live="polite">
+      <div class="la-label">Última acción</div>
+      <div class="la-text" id="laText">esperando tu voz…</div>
     </div>
 
     <div class="mic-zone">
-      <button id="btnMic" class="mic-btn" aria-label="Iniciar o detener escucha por voz">🎤</button>
+      <button id="btnMic" class="mic-btn" aria-label="Iniciar o detener escucha">🎤</button>
       <div class="mic-label" id="micLabel">Pulsa para empezar</div>
-      <div class="mic-hint">Te avisamos cuando esté escuchando.</div>
+      <div class="mic-hint" id="micHint">Da permiso al micrófono y di "señala B3"</div>
     </div>
 
-    <div class="secondary-row">
-      <button id="btnClear" class="btn danger" aria-label="Quitar el señalador">
-        ✖ Quitar señalador
-      </button>
-      <button id="btnGrid" class="btn" aria-label="Mostrar u ocultar cuadrícula">
-        ⊞ Cuadrícula
-      </button>
+    <div class="chips">
+      <button id="btnClear" class="chip danger">✖ Limpiar</button>
+      <button id="btnGrid"  class="chip">⊞ Cuadrícula</button>
+      <button id="btnHelp2" class="chip">? Comandos</button>
     </div>
 
-  </section>
+  </div>
 
-  <section class="panel">
-    <div class="last-action" aria-live="polite">
-      <div class="la-label">Última acción</div>
-      <div class="la-action" id="laAction">esperando tu voz…</div>
-      <div class="la-target" id="laTarget">—</div>
+  <div class="grid-zone">
+    <div class="grid-title">Vista previa · A → P  ·  1 → 9</div>
+    <div class="grid-preview" id="gridPreview" aria-hidden="true"></div>
+  </div>
+
+</div>
+
+<!-- ── Help modal ──────────────────────────────────────────────────────── -->
+<div class="modal-backdrop" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="helpTitle">🐝 MIJA — Guía rápida</h2>
+      <div class="spacer"></div>
+      <button id="btnHelpClose" class="icon-btn" aria-label="Cerrar ayuda">×</button>
     </div>
+    <div class="modal-body">
 
-    <div class="grid-wrap" aria-hidden="true">
-      <div class="grid-title">Vista previa · columnas A → P · filas 1 → 9</div>
-      <div class="grid-preview" id="gridPreview"></div>
+      <div class="audience">
+        <div class="card">
+          <div class="icon" aria-hidden="true">🤖</div>
+          <h3>Para tu asistente virtual</h3>
+          <p>En vez de explicarte dónde está algo, te lo señala. Y si lo autorizas, hace click por ti.</p>
+        </div>
+        <div class="card">
+          <div class="icon" aria-hidden="true">♿</div>
+          <h3>Para discapacidad motriz</h3>
+          <p>Habla y la pantalla responde. Click, doble click, arrastrar, scroll — todo sin mouse.</p>
+        </div>
+      </div>
+
+      <div class="cmd-section">
+        <div class="label">Señalar (solo visual)</div>
+        <div class="commands-grid">
+          <div class="cmd"><code>señala B3</code><span class="cmd-desc">marca B3</span></div>
+          <div class="cmd"><code>marca H5</code><span class="cmd-desc">sinónimo</span></div>
+          <div class="cmd"><code>apunta C7</code><span class="cmd-desc">sinónimo</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-section">
+        <div class="label">Hacer click 🖱️</div>
+        <div class="commands-grid">
+          <div class="cmd"><code>haz click en B3</code><span class="cmd-desc">click izquierdo</span></div>
+          <div class="cmd"><code>doble click H5</code><span class="cmd-desc">o "abre H5"</span></div>
+          <div class="cmd"><code>click derecho C7</code><span class="cmd-desc">menú contextual</span></div>
+          <div class="cmd"><code>B3 punto 5</code><span class="cmd-desc">sub-celda (botón chico)</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-section">
+        <div class="label">Arrastrar y scroll</div>
+        <div class="commands-grid">
+          <div class="cmd"><code>desliza de B3 a F7</code><span class="cmd-desc">arrastre</span></div>
+          <div class="cmd"><code>arrastra A2 hasta H5</code><span class="cmd-desc">igual</span></div>
+          <div class="cmd"><code>scroll arriba</code><span class="cmd-desc">sube</span></div>
+          <div class="cmd"><code>scroll abajo</code><span class="cmd-desc">baja</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-section">
+        <div class="label">Control</div>
+        <div class="commands-grid">
+          <div class="cmd"><code>cuadrícula</code><span class="cmd-desc">muestra/oculta</span></div>
+          <div class="cmd"><code>limpia</code><span class="cmd-desc">quita el señalador</span></div>
+          <div class="cmd"><code>detente</code><span class="cmd-desc">para de escuchar</span></div>
+        </div>
+      </div>
 
       <div class="subgrid-legend">
-        <div class="title">Sub-celdas (di "B3 punto 5" o "B3 botón 5")</div>
+        <div class="title">Sub-celdas dentro de cada celda (12 posiciones)</div>
         <div class="subgrid-mini">
           <div class="sub">1</div><div class="sub">2</div><div class="sub">3</div><div class="sub">4</div>
           <div class="sub">5</div><div class="sub">6</div><div class="sub">7</div><div class="sub">8</div>
           <div class="sub">9</div><div class="sub">10</div><div class="sub">11</div><div class="sub">12</div>
         </div>
       </div>
+
+      <details class="log-wrap">
+        <summary>Ver registro técnico</summary>
+        <div class="log" id="log"></div>
+      </details>
+
     </div>
-  </section>
-
-  <section class="panel">
-    <h2>Lo que puedes decir <span class="pill">en español natural</span></h2>
-
-    <div class="cmd-section">
-      <div class="label">Señalar (solo visual)</div>
-      <div class="commands-grid">
-        <div class="cmd"><code>señala B3</code><span class="cmd-desc">marca la celda B3</span></div>
-        <div class="cmd"><code>marca H5</code><span class="cmd-desc">igual que señala</span></div>
-        <div class="cmd"><code>apunta C7</code><span class="cmd-desc">sinónimo</span></div>
-      </div>
-    </div>
-
-    <div class="cmd-section">
-      <div class="label">Hacer click 🖱️</div>
-      <div class="commands-grid">
-        <div class="cmd"><code>haz click en B3</code><span class="cmd-desc">click izquierdo</span></div>
-        <div class="cmd"><code>doble click H5</code><span class="cmd-desc">o "abre H5"</span></div>
-        <div class="cmd"><code>click derecho C7</code><span class="cmd-desc">menú contextual</span></div>
-        <div class="cmd"><code>B3 punto 5</code><span class="cmd-desc">sub-celda dentro</span></div>
-      </div>
-    </div>
-
-    <div class="cmd-section">
-      <div class="label">Arrastrar y scroll</div>
-      <div class="commands-grid">
-        <div class="cmd"><code>desliza de B3 a F7</code><span class="cmd-desc">arrastre</span></div>
-        <div class="cmd"><code>arrastra A2 hasta H5</code><span class="cmd-desc">igual que desliza</span></div>
-        <div class="cmd"><code>scroll arriba</code><span class="cmd-desc">desplaza arriba</span></div>
-        <div class="cmd"><code>scroll abajo</code><span class="cmd-desc">desplaza abajo</span></div>
-      </div>
-    </div>
-
-    <div class="cmd-section">
-      <div class="label">Control</div>
-      <div class="commands-grid">
-        <div class="cmd"><code>cuadrícula</code><span class="cmd-desc">muestra/oculta</span></div>
-        <div class="cmd"><code>limpia</code><span class="cmd-desc">quita el señalador</span></div>
-        <div class="cmd"><code>detente</code><span class="cmd-desc">para de escuchar</span></div>
-      </div>
-    </div>
-
-    <details class="log-wrap">
-      <summary>Ver registro técnico</summary>
-      <div class="log" id="log"></div>
-    </details>
-  </section>
-
-  <footer>
-    Hecho con cuidado por <span class="signature">IArtLabs</span> ·
-    MIJA Focus Overlay — accesibilidad libre y abierta
-  </footer>
-
+  </div>
 </div>
 
 <script>
 const API = window.location.origin;
 const $ = (id) => document.getElementById(id);
 const statusEl   = $("status");
-const laAction   = $("laAction");
-const laTarget   = $("laTarget");
+const laText     = $("laText");
 const logEl      = $("log");
 const btnMic     = $("btnMic");
 const btnClear   = $("btnClear");
 const btnGrid    = $("btnGrid");
+const btnHelp    = $("btnHelp");
+const btnHelp2   = $("btnHelp2");
+const btnHelpClose = $("btnHelpClose");
 const micLabel   = $("micLabel");
 const gridPrev   = $("gridPreview");
+const helpModal  = $("helpModal");
 
 // ── Build grid preview ───────────────────────────────────────────────────
 const COLS = "ABCDEFGHIJKLMNOP";
@@ -537,254 +557,164 @@ for (let r = 1; r <= 9; r++) {
     gridPrev.appendChild(div);
   }
 }
-
-function clearCellMarks() {
-  Object.values(cells).forEach((c) => {
-    c.classList.remove("hit", "click-flash");
-  });
-}
-function markCell(cell, mode = "hit") {
-  clearCellMarks();
-  if (cells[cell]) cells[cell].classList.add(mode);
-}
+function clearCellMarks() { Object.values(cells).forEach((c) => c.classList.remove("hit", "click-flash")); }
+function markCell(cell, mode = "hit") { clearCellMarks(); if (cells[cell]) cells[cell].classList.add(mode); }
 
 // ── Logging ──────────────────────────────────────────────────────────────
 function log(msg, level = "") {
   const entry = document.createElement("div");
   entry.className = "entry " + level;
-  const ts = new Date().toLocaleTimeString();
-  entry.textContent = `[${ts}] ${msg}`;
+  entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
   logEl.prepend(entry);
-  while (logEl.children.length > 50) logEl.removeChild(logEl.lastChild);
+  while (logEl.children.length > 60) logEl.removeChild(logEl.lastChild);
 }
 
-// ── Audio feedback ───────────────────────────────────────────────────────
 function speak(text) {
   if (!("speechSynthesis" in window)) return;
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = "es-MX";
-  u.rate = 1.15;
-  u.volume = 0.65;
+  u.lang = "es-MX"; u.rate = 1.15; u.volume = 0.65;
   window.speechSynthesis.speak(u);
 }
 
-// ── UI feedback ──────────────────────────────────────────────────────────
-function showAction(action, target) {
-  laAction.textContent = action;
-  laTarget.innerHTML = target;
+function setStatus(text, kind = "") {
+  statusEl.textContent = text;
+  statusEl.className = "status-pill" + (kind ? " " + kind : "");
+}
+
+function setLastAction(verb, target) {
+  laText.innerHTML = `<span class="verb">${verb}</span>${target}`;
 }
 
 // ── Spanish parsing ──────────────────────────────────────────────────────
 const SPELLED_LETTER = {
-  "a": "A",
-  "be": "B", "ve": "B", "b": "B",
-  "ce": "C", "c": "C", "se": "C",
-  "de": "D", "d": "D",
-  "e": "E",
-  "efe": "F", "f": "F",
-  "ge": "G", "g": "G",
-  "hache": "H", "h": "H", "ache": "H",
-  "i": "I", "y": "I",
-  "jota": "J", "j": "J",
-  "ka": "K", "ca": "K", "k": "K",
-  "ele": "L", "l": "L",
-  "eme": "M", "m": "M",
-  "ene": "N", "n": "N",
-  "o": "O",
-  "pe": "P", "p": "P",
+  "a":"A","be":"B","ve":"B","b":"B","ce":"C","c":"C","se":"C","de":"D","d":"D","e":"E",
+  "efe":"F","f":"F","ge":"G","g":"G","hache":"H","h":"H","ache":"H","i":"I","y":"I",
+  "jota":"J","j":"J","ka":"K","ca":"K","k":"K","ele":"L","l":"L","eme":"M","m":"M",
+  "ene":"N","n":"N","o":"O","pe":"P","p":"P",
 };
 const SPELLED_NUMBER = {
-  "uno": 1, "un": 1,
-  "dos": 2, "tres": 3, "cuatro": 4, "cinco": 5,
-  "seis": 6, "siete": 7, "ocho": 8, "nueve": 9,
-  "diez": 10, "once": 11, "doce": 12,
+  "uno":1,"un":1,"dos":2,"tres":3,"cuatro":4,"cinco":5,"seis":6,"siete":7,"ocho":8,"nueve":9,
+  "diez":10,"once":11,"doce":12,
 };
-
-function normalize(text) {
-  return text
-    .toLowerCase()
-    .normalize("NFD").replace(/[̀-ͯ]/g, "")
-    .replace(/[^\w\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+function normalize(t) {
+  return t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^\w\s]/g," ").replace(/\s+/g," ").trim();
 }
-
 function extractAllCells(text) {
-  const n = normalize(text);
-  const found = [];
-
-  // Direct: B3, b3, B 3
-  const re = /\b([a-p])\s*([1-9])\b/g;
-  let m;
-  while ((m = re.exec(n)) !== null) {
-    found.push({ cell: (m[1] + m[2]).toUpperCase(), idx: m.index });
-  }
-
-  // Spelled
-  const tokens = n.split(" ");
-  let pos = 0;
+  const n = normalize(text); const found = [];
+  let m; const re = /\b([a-p])\s*([1-9])\b/g;
+  while ((m = re.exec(n)) !== null) found.push({cell:(m[1]+m[2]).toUpperCase(), idx:m.index});
+  const tokens = n.split(" "); let pos = 0;
   for (let i = 0; i < tokens.length - 1; i++) {
     const letter = SPELLED_LETTER[tokens[i]];
-    const next = tokens[i + 1];
-    const num = SPELLED_NUMBER[next] !== undefined
-      ? SPELLED_NUMBER[next]
-      : parseInt(next, 10);
-    if (letter && num >= 1 && num <= 9) {
-      found.push({ cell: letter + num, idx: pos });
-    }
+    const next = tokens[i+1];
+    const num = SPELLED_NUMBER[next] !== undefined ? SPELLED_NUMBER[next] : parseInt(next,10);
+    if (letter && num >= 1 && num <= 9) found.push({cell: letter+num, idx: pos});
     pos += tokens[i].length + 1;
   }
-  found.sort((a, b) => a.idx - b.idx);
-  // dedupe consecutive identical cells (regex + spelled can double-match)
-  const out = [];
-  for (const f of found) {
-    if (!out.length || out[out.length - 1] !== f.cell) out.push(f.cell);
-  }
+  found.sort((a,b) => a.idx - b.idx);
+  const out = []; for (const f of found) if (!out.length || out[out.length-1] !== f.cell) out.push(f.cell);
   return out;
 }
-
 function parseCellAndSub(text) {
   const n = normalize(text);
   const cells = extractAllCells(text);
   if (!cells.length) return null;
   const cell = cells[0];
-
-  // Sub-cell: "punto/numero/boton N"
   const subRe = /\b(?:punto|numero|boton|subcelda|posicion)\s+(\d{1,2}|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce)\b/;
   const sm = n.match(subRe);
   let sub = 0;
   if (sm) {
-    sub = SPELLED_NUMBER[sm[1]] !== undefined ? SPELLED_NUMBER[sm[1]] : parseInt(sm[1], 10);
+    sub = SPELLED_NUMBER[sm[1]] !== undefined ? SPELLED_NUMBER[sm[1]] : parseInt(sm[1],10);
     if (sub < 1 || sub > 12) sub = 0;
   }
   return { cell, sub };
 }
 
-// ── Action dispatch ──────────────────────────────────────────────────────
+// ── API ──────────────────────────────────────────────────────────────────
 async function apiPost(path, body = null) {
   log(`POST ${path} ${body ? JSON.stringify(body) : ""}`);
   try {
     const opts = { method: "POST" };
-    if (body) {
-      opts.headers = { "Content-Type": "application/json" };
-      opts.body = JSON.stringify(body);
-    }
+    if (body) { opts.headers = {"Content-Type":"application/json"}; opts.body = JSON.stringify(body); }
     const r = await fetch(`${API}${path}`, opts);
     return await r.json();
-  } catch (e) {
-    log(`✗ ${e.message}`, "err");
-    speak("error de conexión");
-    return null;
-  }
+  } catch (e) { log(`✗ ${e.message}`, "err"); speak("error de conexion"); return null; }
 }
 
+// ── Actions ──────────────────────────────────────────────────────────────
 async function actHighlight(cell, sub = 0) {
   markCell(cell, "hit");
   const label = sub ? `${cell}.${sub}` : cell;
-  showAction("Señalando", label);
+  setLastAction("Señalando", label);
+  setStatus("Señalando " + label, "action");
   speak(label.replace(".", " punto "));
-  await apiPost("/highlight/cell", {
-    cell, color: "#d97706", label, duration: 8.0, monitor: 0,
-  });
+  await apiPost("/highlight/cell", { cell, color:"#d97706", label, duration:8.0, monitor:0 });
   log(`✓ señalado ${label}`, "ok");
+  setStatus(listening ? "Escuchando" : "Listo", listening ? "live" : "");
 }
 
 async function actClick(cell, sub = 0, button = "left", double = false) {
   markCell(cell, "click-flash");
   const verb = double ? "Doble click" : (button === "right" ? "Click derecho" : "Click");
   const target = sub ? `${cell}.${sub}` : cell;
-  showAction(verb, target);
+  setLastAction(verb, target);
+  setStatus(`${verb} ${target}`, "action");
   speak(`${verb.toLowerCase()} en ${target.replace(".", " punto ")}`);
-  const r = await apiPost("/click", {
-    cell, sub, button, double, monitor: 0, flash: true,
-  });
-  if (r?.status === "success") log(`✓ ${verb} → ${target} (${r.x},${r.y})`, "act");
+  const r = await apiPost("/click", { cell, sub, button, double, monitor:0, flash:true });
+  if (r?.status === "success") log(`✓ ${verb} → ${target}`, "act");
+  setStatus(listening ? "Escuchando" : "Listo", listening ? "live" : "");
 }
 
-async function actDrag(fromCell, toCell) {
-  showAction("Arrastrando", `${fromCell} → ${toCell}`);
-  speak(`arrastrar de ${fromCell} a ${toCell}`);
-  const r = await apiPost("/drag", {
-    from_cell: fromCell, to_cell: toCell, monitor: 0, duration: 0.5, flash: true,
-  });
-  if (r?.status === "success") log(`✓ drag ${fromCell} → ${toCell}`, "act");
+async function actDrag(from, to) {
+  setLastAction("Arrastrando", `${from} → ${to}`);
+  setStatus(`Arrastra ${from} → ${to}`, "action");
+  speak(`arrastrar de ${from} a ${to}`);
+  await apiPost("/drag", { from_cell:from, to_cell:to, monitor:0, duration:0.5, flash:true });
+  log(`✓ drag ${from} → ${to}`, "act");
+  setStatus(listening ? "Escuchando" : "Listo", listening ? "live" : "");
 }
 
 async function actScroll(direction, cell = "H5") {
-  showAction(`Scroll ${direction === "up" ? "arriba" : "abajo"}`, cell);
+  const verb = direction === "up" ? "Scroll ↑" : "Scroll ↓";
+  setLastAction(verb, cell);
+  setStatus(verb, "action");
   speak(`scroll ${direction === "up" ? "arriba" : "abajo"}`);
-  await apiPost("/scroll", { cell, direction, clicks: 3, monitor: 0 });
+  await apiPost("/scroll", { cell, direction, clicks:3, monitor:0 });
+  setStatus(listening ? "Escuchando" : "Listo", listening ? "live" : "");
 }
 
 function dispatchPhrase(raw) {
   const text = normalize(raw);
 
-  // STOP
-  if (/\b(detente|detener|para|fin|alto|stop)\b/.test(text)) {
-    speak("escucha detenida");
-    stopListening();
-    return;
-  }
-
-  // CLEAR
+  if (/\b(detente|detener|para|fin|alto|stop)\b/.test(text)) { speak("escucha detenida"); stopListening(); return; }
   if (/\b(limpia|limpiar|borra|borrar|quita|quitar|clear)\b/.test(text)) {
-    apiPost("/clear");
-    clearCellMarks();
-    showAction("Limpio", "—");
-    speak("limpio");
-    return;
+    apiPost("/clear"); clearCellMarks(); setLastAction("Limpio", "—"); speak("limpio"); return;
   }
-
-  // GRID
   if (/\b(rejilla|cuadricula|grid|cuadrilla)\b/.test(text) && !/\bboton(es)?\b/.test(text)) {
-    apiPost("/grid/toggle");
-    showAction("Cuadrícula", "alternada");
-    speak("cuadricula");
-    return;
+    apiPost("/grid/toggle"); setLastAction("Cuadrícula", "alternada"); speak("cuadricula"); return;
   }
-
-  // SCROLL
-  if (/\b(scroll|desplaza|desplazar)\b/.test(text) ||
-      /\b(baja|bajar|sube|subir)\b.*pantalla/.test(text)) {
+  if (/\b(scroll|desplaza|desplazar)\b/.test(text) || /\b(baja|bajar|sube|subir)\b.*pantalla/.test(text)) {
     const dir = /\b(arriba|sube|subir|up)\b/.test(text) ? "up" : "down";
-    actScroll(dir);
-    return;
+    actScroll(dir); return;
   }
-
-  // DRAG — needs two cells and a drag verb
   if (/\b(desliza|deslizar|arrastra|arrastrar|mueve|mover|drag)\b/.test(text)) {
     const all = extractAllCells(text);
     if (all.length >= 2) { actDrag(all[0], all[1]); return; }
-    if (all.length === 1) {
-      log(`Drag necesita dos celdas, solo encontré ${all[0]}`, "err");
-      speak("dime de qué celda a qué celda");
-      return;
-    }
+    if (all.length === 1) { log(`Drag necesita 2 celdas, solo ${all[0]}`, "err"); speak("dime de qué celda a qué celda"); return; }
   }
-
-  // RIGHT CLICK
   if (/\b(click derecho|derecho click|boton derecho|menu contextual)\b/.test(text)) {
-    const c = parseCellAndSub(text);
-    if (c) { actClick(c.cell, c.sub, "right", false); return; }
+    const c = parseCellAndSub(text); if (c) { actClick(c.cell, c.sub, "right", false); return; }
   }
-
-  // DOUBLE CLICK
   if (/\b(doble click|click doble|abre|abrir|dos veces)\b/.test(text)) {
-    const c = parseCellAndSub(text);
-    if (c) { actClick(c.cell, c.sub, "left", true); return; }
+    const c = parseCellAndSub(text); if (c) { actClick(c.cell, c.sub, "left", true); return; }
   }
-
-  // SINGLE CLICK
   if (/\b(haz click|hacer click|click|toca|tocar|tap|presiona|presionar|pulsa|pulsar|selecciona|seleccionar|escoge|elige)\b/.test(text)) {
-    const c = parseCellAndSub(text);
-    if (c) { actClick(c.cell, c.sub, "left", false); return; }
+    const c = parseCellAndSub(text); if (c) { actClick(c.cell, c.sub, "left", false); return; }
   }
-
-  // HIGHLIGHT (default if a cell is present)
   const c = parseCellAndSub(text);
   if (c) { actHighlight(c.cell, c.sub); return; }
-
   log(`No entendí: "${raw}"`, "err");
+  setLastAction("?", `"${raw}"`);
 }
 
 // ── SpeechRecognition ────────────────────────────────────────────────────
@@ -794,17 +724,13 @@ let listening = false;
 
 function buildRecognition() {
   if (!SR) {
-    statusEl.className = "status error";
-    statusEl.innerHTML = "⚠ Tu navegador no soporta reconocimiento de voz. Abre esta página en <strong>Edge</strong> o <strong>Chrome</strong>.";
+    setStatus("Sin soporte de voz", "error");
     btnMic.disabled = true;
+    micLabel.textContent = "Tu navegador no soporta voz";
     return null;
   }
   const r = new SR();
-  r.lang = "es-MX";
-  r.continuous = true;
-  r.interimResults = false;
-  r.maxAlternatives = 1;
-
+  r.lang = "es-MX"; r.continuous = true; r.interimResults = false; r.maxAlternatives = 1;
   r.onresult = (ev) => {
     for (let i = ev.resultIndex; i < ev.results.length; i++) {
       if (ev.results[i].isFinal) {
@@ -817,8 +743,8 @@ function buildRecognition() {
   r.onerror = (ev) => {
     log(`STT error: ${ev.error}`, "err");
     if (ev.error === "not-allowed" || ev.error === "service-not-allowed") {
-      statusEl.className = "status error";
-      statusEl.innerHTML = "⚠ Permiso de micrófono denegado. Permítelo en el ícono junto a la URL.";
+      setStatus("Permiso denegado", "error");
+      micLabel.textContent = "Permite el micrófono";
       stopListening();
     }
   };
@@ -831,8 +757,7 @@ function startListening() {
   if (!recognition) return;
   listening = true;
   try { recognition.start(); } catch (e) { log(`start: ${e.message}`, "err"); }
-  statusEl.className = "status live";
-  statusEl.innerHTML = "🎧 Escuchando — habla con calma, te entiendo.";
+  setStatus("Escuchando", "live");
   btnMic.classList.add("active");
   micLabel.textContent = "Pulsa para detener";
   speak("te escucho");
@@ -841,40 +766,38 @@ function startListening() {
 function stopListening() {
   listening = false;
   if (recognition) { try { recognition.stop(); } catch (_) {} }
-  statusEl.className = "status";
-  statusEl.innerHTML = "Detenido. Pulsa el micrófono para volver a escuchar.";
+  setStatus("Listo");
   btnMic.classList.remove("active");
   micLabel.textContent = "Pulsa para empezar";
 }
 
 function toggleListening() { listening ? stopListening() : startListening(); }
 
-// ── Wire UI ──────────────────────────────────────────────────────────────
-btnMic.addEventListener("click", toggleListening);
-btnClear.addEventListener("click", () => {
-  apiPost("/clear");
-  clearCellMarks();
-  showAction("Limpio", "—");
-});
-btnGrid.addEventListener("click", () => apiPost("/grid/toggle"));
+// ── Help modal ──────────────────────────────────────────────────────────
+function openHelp()  { helpModal.classList.add("open"); }
+function closeHelp() { helpModal.classList.remove("open"); }
 
+// ── Wire UI ─────────────────────────────────────────────────────────────
+btnMic.addEventListener("click", toggleListening);
+btnClear.addEventListener("click", () => { apiPost("/clear"); clearCellMarks(); setLastAction("Limpio", "—"); });
+btnGrid.addEventListener("click", () => apiPost("/grid/toggle"));
+btnHelp.addEventListener("click", openHelp);
+btnHelp2.addEventListener("click", openHelp);
+btnHelpClose.addEventListener("click", closeHelp);
+helpModal.addEventListener("click", (e) => { if (e.target === helpModal) closeHelp(); });
 document.addEventListener("keydown", (e) => {
+  if (e.code === "Escape" && helpModal.classList.contains("open")) { closeHelp(); return; }
   if (e.code === "Space" && !["INPUT","TEXTAREA"].includes(document.activeElement.tagName)) {
     e.preventDefault();
     toggleListening();
   }
 });
 
-// ── Boot ─────────────────────────────────────────────────────────────────
-log("MIJA cargada. Permite el micrófono cuando lo pida.");
+// ── Boot ────────────────────────────────────────────────────────────────
+log("MIJA cargada.");
 fetch(`${API}/status`).then((r) => r.json()).then((s) => {
-  if (s.components?.overlay === "running") {
-    log("Overlay activo · v" + (s.version || "?"), "ok");
-  } else {
-    log("Overlay parado — corre MIJA_SEÑALADORA.bat", "err");
-    statusEl.className = "status error";
-    statusEl.innerHTML = "⚠ El señalador no está corriendo. Abre <code>MIJA_SEÑALADORA.bat</code> primero.";
-  }
+  if (s.components?.overlay === "running") log("Overlay activo · v" + (s.version || "?"), "ok");
+  else { log("Overlay parado", "err"); setStatus("Señalador parado", "error"); }
 }).catch(() => log("API offline", "err"));
 </script>
 </body>
