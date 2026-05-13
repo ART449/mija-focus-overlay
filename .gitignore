@@ -21,6 +21,11 @@ _evidencia/*.jpg
 # agent inbox (JSONL diarios efímeros)
 agent_inbox/*.jsonl
 
+# runtime logs
+overlay_log.txt
+
 # venv / build artifacts
 .venv*/
 *.egg-info/
+dist/
+build/

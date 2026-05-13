@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mija-overlay"
+version = "2.0.0"
+description = "AI-to-Human visual guidance protocol. Let your agents point at things on screen."
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "Arturo", email = "arturo@iartlabs.ai"}]
+maintainers = [{name = "IArtLabs"}]
+keywords = [
+    "ai-agents",
+    "visual-overlay",
+    "human-ai-interaction",
+    "agent-tools",
+    "windows",
+    "opencv",
+    "screen-highlight",
+    "accessibility",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: User Interfaces",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.9"
+
+dependencies = [
+    "pillow",
+    "pywin32",
+]
+
+[project.optional-dependencies]
+vision = ["opencv-python", "numpy"]
+api = ["fastapi", "uvicorn"]
+langchain = ["langchain-core", "pydantic"]
+crewai = ["crewai"]
+all = [
+    "mija-overlay[vision,api,langchain,crewai]",
+]
+
+[project.scripts]
+mija = "mija_sdk._core:_cli_main"
+
+[project.urls]
+Homepage = "https://github.com/ART449/mija-focus-overlay"
+Repository = "https://github.com/ART449/mija-focus-overlay"
+Issues = "https://github.com/ART449/mija-focus-overlay/issues"
+
+[tool.setuptools.packages.find]
+include = ["mija_sdk*"]
