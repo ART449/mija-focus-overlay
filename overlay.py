@@ -71,6 +71,14 @@ GRID_LINE_DASH   = (6, 14)
 GRID_HEADER_FONT = ("Consolas", 11, "bold")
 GRID_CELL_FONT   = ("Consolas", 8)
 
+# ── Calibration HUD ─────────────────────────────────────────────────────────
+HUD_BG           = "#07130d"
+HUD_BORDER       = "#22c55e"
+HUD_TITLE_COLOR  = "#d7ffe7"
+HUD_BODY_COLOR   = "#b5f7c9"
+HUD_FONT_TITLE   = ("Consolas", 11, "bold")
+HUD_FONT_BODY    = ("Consolas", 9, "bold")
+
 # ── Highlight visuals ─────────────────────────────────────────────────────────
 HIGHLIGHT_OUTLINE = "#00ff66"
 LABEL_BG          = "#0a0a0a"
@@ -186,12 +194,17 @@ class MIJAOverlay:
                 "win": win, "canvas": canvas,
                 "rect": rect, "bubble": bubble, "text": text,
                 "x": mx, "y": my, "w": mw, "h": mh,
+                "index": i + 1,
                 "pulse_val": 0, "pulse_dir": 1, "pulse_active": False,
                 "grid_items": [],
+                "hud_items": [],
             })
 
         self.last_mtime = 0
         self.command_file = os.path.join(self.base_dir, "command.json")
+        # La cuadrícula debe quedar fija por defecto; si se apaga en sesión,
+        # el reinicio vuelve a dejarla visible.
+        self.show_grid()
         self.check_commands()
         self.animate()
 
@@ -274,12 +287,62 @@ class MIJAOverlay:
         for item in screen["grid_items"]:
             screen["canvas"].delete(item)
         screen["grid_items"] = []
+        for item in screen["hud_items"]:
+            screen["canvas"].delete(item)
+        screen["hud_items"] = []
+
+    def _draw_hud(self, screen):
+        """Persistent calibration legend shown on every monitor."""
+        canvas = screen["canvas"]
+        items = []
+
+        pad = 12
+        x0 = 10
+        y0 = 10
+        x1 = x0 + 324
+        y1 = y0 + 104
+
+        panel = canvas.create_rectangle(
+            x0, y0, x1, y1,
+            fill=HUD_BG,
+            outline=HUD_BORDER,
+            width=2,
+        )
+        items.append(panel)
+
+        title = canvas.create_text(
+            x0 + pad, y0 + 14,
+            text="MIJA FOCUS | GRID FIJA",
+            fill=HUD_TITLE_COLOR,
+            font=HUD_FONT_TITLE,
+            anchor="nw",
+        )
+        items.append(title)
+
+        lines = [
+            f"MONITOR {screen['index']}: {screen['w']}x{screen['h']}  @ {screen['x']},{screen['y']}",
+            "CUADRICULA: A-P / 1-9 + A1..P9",
+            "AJUSTES: main.py grid_on | grid_off | grid_toggle",
+            "CALIBRAR: main.py calibrate",
+        ]
+        for idx, line in enumerate(lines):
+            t = canvas.create_text(
+                x0 + pad, y0 + 36 + (idx * 17),
+                text=line,
+                fill=HUD_BODY_COLOR,
+                font=HUD_FONT_BODY,
+                anchor="nw",
+            )
+            items.append(t)
+
+        screen["hud_items"] = items
 
     def show_grid(self):
         if self.grid_visible:
             return
         for s in self.screens:
             self._draw_grid(s)
+            self._draw_hud(s)
         self.grid_visible = True
 
     def hide_grid(self):
@@ -321,8 +384,17 @@ class MIJAOverlay:
                 mtime = os.path.getmtime(self.command_file)
                 if mtime > self.last_mtime:
                     self.last_mtime = mtime
-                    with open(self.command_file, "r") as f:
-                        cmd = json.load(f)
+                    try:
+                        with open(self.command_file, "r", encoding="utf-8") as f:
+                            cmd = json.load(f)
+                    except PermissionError:
+                        # Windows puede bloquear brevemente el archivo durante un replace atomico.
+                        self.root.after(100, self.check_commands)
+                        return
+                    except json.JSONDecodeError:
+                        # Si el writer esta a medio cambio, reintentamos en el siguiente tick.
+                        self.root.after(100, self.check_commands)
+                        return
 
                     action = cmd.get("action", "")
 

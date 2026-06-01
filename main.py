@@ -19,9 +19,10 @@ def main():
         print("Usage:")
         print("  python main.py highlight <x> <y> <w> <h> [color] [label] [duration]")
         print("  python main.py cell <CELL> [color] [label] [duration] [monitor]  e.g. cell B3 green")
-        print("  python main.py grid_on       -- mostrar cuadrícula A-P / 1-9")
+        print("  python main.py grid_on       -- mostrar cuadrícula fija + HUD")
         print("  python main.py grid_off      -- ocultar cuadrícula")
         print("  python main.py grid_toggle   -- alternar cuadrícula")
+        print("  python main.py calibrate     -- grid fija + marco por monitor")
         print("  python main.py clear")
         print("  python main.py capture")
         print("  python main.py test")
@@ -115,6 +116,7 @@ def main():
 
     elif cmd == "calibrate":
         print("Iniciando Calibración Multi-Monitor...")
+        send_command({"action": "grid_on"})
         import win32api
         monitors = win32api.EnumDisplayMonitors()
         for i, m in enumerate(monitors):
@@ -135,7 +137,7 @@ def main():
             print(f"Monitor {i+1} calibrado: {rect}")
             import time
             time.sleep(1.5) # Pausa para que el usuario vea cada monitor
-        print("Calibración completada.")
+        print("Calibración completada. Grid fija y HUD visibles.")
 
     elif cmd == "save_template":
         if len(sys.argv) < 7:
